@@ -1,0 +1,29 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main  # O deploy será executado quando fizer push na branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar SSH
+        run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H ${{ secrets.HOSTINGER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Subir arquivos para o servidor
+        run: |
+            rsync -avz ./site/ root@${{ secrets.HOSTINGER_IP }}:/root/fintrix/
+
+      - name: Ajustar permissões do storage e cache
+        run: |
+            ssh root@${{ secrets.HOSTINGER_IP }} 'docker exec codetrix_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache'
