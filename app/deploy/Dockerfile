@@ -14,9 +14,8 @@ RUN apk add --no-cache --update \
     libjpeg-turbo-dev \
     libpng-dev \
     sqlite-dev \
-    # Node.js installation
+    # Node.js and Yarn installation
     nodejs \
-    npm \
     yarn \
     # Build dependencies (removed later)
     && docker-php-ext-configure zip \
@@ -40,8 +39,8 @@ RUN mkdir -p storage bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache \
     && composer install --no-dev --prefer-dist --optimize-autoloader \
-    && npm install \
-    && npm run build \
+    && ([ -f package.json ] && yarn install --frozen-lockfile || true) \
+    && ([ -f package.json ] && yarn build || true) \
     && chown -R www-data:www-data vendor \
     && rm -rf /tmp/*
 
