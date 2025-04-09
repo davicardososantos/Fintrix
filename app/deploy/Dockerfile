@@ -17,10 +17,10 @@ RUN apk add --no-cache --update \
     # Node.js and Yarn installation
     nodejs \
     yarn \
-    # Build dependencies (removed later)
+    # Build dependencies
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip pdo pdo_mysql \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd \
     # Clean up
@@ -39,43 +39,39 @@ RUN mkdir -p storage bootstrap/cache \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache \
     && composer install --no-dev --prefer-dist --optimize-autoloader \
-    && ([ -f package.json ] && yarn install --frozen-lockfile || true) \
-    && ([ -f package.json ] && yarn build || true) \
+    && ([ -f package.json ] && yarn install --frozen-lockfile || echo "Skipping Yarn (no package.json)") \
+    && ([ -f package.json ] && yarn build || echo "Skipping Yarn build") \
     && chown -R www-data:www-data vendor \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* /root/.npm /root/.yarn*
 
 # stage 2: production stage
 FROM php:8.3-fpm-alpine
 
-# Install production dependencies with proper libpng
-RUN apk add --no-cache --update \
-    nginx \
-    supervisor \
-    # PHP dependencies - ATENÇÃO À ORDEM E PACOTES
-    libpng-dev \  # Adicionado explicitamente
-    libpng \      # Biblioteca runtime
-    zlib-dev \
-    libzip-dev \
-    freetype-dev \  # Necessário para GD
-    libjpeg-turbo-dev \
-    oniguruma-dev \
-    gettext-dev \
-    # Dependências de compilação
-    pkgconfig \    # Adicionado para resolver pkg-config
-    # Bibliotecas runtime
+# Install production dependencies
+RUN apk add --no-cache --update --virtual .build-deps \
+        libpng-dev \
+        freetype-dev \
+        libjpeg-turbo-dev \
+        zlib-dev \
+        libzip-dev \
+        oniguruma-dev \
+        gettext-dev \
+        pkgconfig \
     && apk add --no-cache \
+        nginx \
+        supervisor \
+        libpng \
         freetype \
         libjpeg-turbo \
+        libzip \
     # Install extensions
-    && docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         zip pdo pdo_mysql gd bcmath exif gettext opcache \
     && docker-php-ext-enable opcache \
     # Clean up
-    && apk del .build-deps \  # Remove dependências de compilação
-    && rm -rf /var/cache/apk/*
+    && apk del .build-deps \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 # Copy from build stage
 COPY --from=build /var/www/html /var/www/html
