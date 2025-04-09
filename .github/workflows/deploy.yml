@@ -22,7 +22,7 @@ jobs:
 
       - name: Subir arquivos para o servidor
         run: |
-            rsync -avz ./site/ root@${{ secrets.HOSTINGER_IP }}:/root/fintrix/
+            rsync -avz ./app/ root@${{ secrets.HOSTINGER_IP }}:/root/fintrix/
 
       - name: Ajustar permissões do storage e cache
         run: |
