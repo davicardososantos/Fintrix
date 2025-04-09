@@ -47,23 +47,34 @@ RUN mkdir -p storage bootstrap/cache \
 # stage 2: production stage
 FROM php:8.3-fpm-alpine
 
-# Install production dependencies
+# Install production dependencies with proper libpng
 RUN apk add --no-cache --update \
     nginx \
     supervisor \
-    # PHP dependencies
-    zip \
+    # PHP dependencies - ATENÇÃO À ORDEM E PACOTES
+    libpng-dev \  # Adicionado explicitamente
+    libpng \      # Biblioteca runtime
+    zlib-dev \
     libzip-dev \
-    freetype \
-    libjpeg-turbo \
-    libpng \
+    freetype-dev \  # Necessário para GD
+    libjpeg-turbo-dev \
     oniguruma-dev \
     gettext-dev \
+    # Dependências de compilação
+    pkgconfig \    # Adicionado para resolver pkg-config
+    # Bibliotecas runtime
+    && apk add --no-cache \
+        freetype \
+        libjpeg-turbo \
     # Install extensions
+    && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
     && docker-php-ext-install \
         zip pdo pdo_mysql gd bcmath exif gettext opcache \
     && docker-php-ext-enable opcache \
     # Clean up
+    && apk del .build-deps \  # Remove dependências de compilação
     && rm -rf /var/cache/apk/*
 
 # Copy from build stage
