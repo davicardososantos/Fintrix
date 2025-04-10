@@ -45,7 +45,7 @@ services:
 
   fintrix_database:
     restart: unless-stopped
-    container_name: fintrix_db
+    container_name: codetrix_db 
     image: mariadb:lts-jammy
     volumes:
       - v-database:/var/lib/mysql
@@ -56,21 +56,23 @@ services:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     networks:
       - n-laravel
-
-  fintrix_phpmyadmin:
-    restart: unless-stopped
-    container_name: fintrix_phpmyadmin
-    image: phpmyadmin:latest
-    environment:
-      PMA_HOST: fintrix_database
-      PMA_USER: ${DB_USERNAME}
-      PMA_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "8083:80"
-    networks:
-      - n-laravel
-    depends_on:
-      - fintrix_database
+      - "3306:3306"
+
+  # fintrix_phpmyadmin:
+  #   restart: unless-stopped
+  #   container_name: fintrix_phpmyadmin
+  #   image: phpmyadmin:latest
+  #   environment:
+  #     PMA_HOST: fintrix_database
+  #     PMA_USER: ${DB_USERNAME}
+  #     PMA_PASSWORD: ${DB_PASSWORD}
+  #   ports:
+  #     - "8083:80"
+  #   networks:
+  #     - n-laravel
+  #   depends_on:
+  #     - fintrix_database
 
 volumes:
   v-database:
