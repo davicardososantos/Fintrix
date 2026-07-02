@@ -3,16 +3,19 @@
 > Fases de entrega. Cada fase vira código guiado pelos [specs/](./specs/). Princípio da
 > [constitution.md](./constitution.md): **simples primeiro**, evoluir depois.
 
-## Fase 0 — Fundação SDD ✅ (atual)
+## Fase 0 — Fundação SDD ✅
 Documentação viva do projeto: constitution, PRD, architecture, data-model, theme, design-system,
 frontend-guidelines, pwa, roadmap, glossary, ADR-0001 e specs 001–006. Nenhum código de app.
 **Saída:** `docs/` completo + README.
 
-## Fase 1 — Scaffold técnico
-Projeto Next.js 15 + TS, Docker Compose (`app`, `db` MySQL, `adminer`), Tailwind + shadcn com o
-**tema aplicado** ([theme.md](./theme.md)), Prisma com schema inicial ([data-model.md](./data-model.md)),
-NextAuth (contas + Household), `lib/money.ts`, ESLint/Prettier.
-**Saída:** app sobe com `docker compose up`, login funciona, tema visível, migration inicial aplicada.
+## Fase 1 — Scaffold técnico ✅ (atual)
+Projeto Next.js 15 + TS, Docker Compose (`app`, `db` MySQL, `adminer` + serviço `migrate`),
+Tailwind + shadcn com o **tema aplicado** ([theme.md](./theme.md)), Prisma com schema inicial
+([data-model.md](./data-model.md)), NextAuth (contas + Household, config dividida para o Edge),
+`lib/money.ts`, ESLint/Prettier.
+**Saída (verificada):** app sobe com `docker compose up` nas portas do Fintrix (app 3100, MySQL 3310,
+Adminer 8090); login/logout funcionam (fluxo real testado ponta a ponta); tema Verde/Teal visível;
+migration inicial `init` aplicada. Bottom-nav e telas-placeholder das próximas fases no lugar.
 
 ## Fase 2 — Importação (E1)
 Upload + detecção de fonte + parsers (C6 extrato, C6 fatura, Alelo PDF) + **dedup idempotente** +

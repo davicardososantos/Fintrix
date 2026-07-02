@@ -1,0 +1,253 @@
+// Fintrix — schema inicial. Reflete docs/data-model.md.
+// Regras: dinheiro em centavos (Int); isolamento por householdId; import idempotente (dedupHash).
+// Auth é credentials-only (JWT) — sem tabelas de adapter NextAuth por ora; por isso a conta
+// financeira se chama `FinancialAccount` (evita colisão futura com `Account` de OAuth).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  owner
+  member
+}
+
+enum AccountType {
+  checking
+  credit_card
+  meal_voucher
+  cash
+  other
+}
+
+enum ImportSource {
+  c6_extrato
+  c6_fatura
+  alelo
+}
+
+enum CategoryKind {
+  expense
+  income
+  transfer
+  investment
+}
+
+enum CategorySource {
+  c6
+  rule
+  ai
+  manual
+  uncategorized
+}
+
+enum RuleMatchType {
+  contains
+  regex
+  equals
+}
+
+enum PointsProgramName {
+  smiles
+  livelo
+  azul
+  latam
+}
+
+enum InvestmentType {
+  cdb
+  other
+}
+
+model Household {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users        User[]
+  accounts     FinancialAccount[]
+  categories   Category[]
+  rules        CategoryRule[]
+  importBatches ImportBatch[]
+  transactions Transaction[]
+  pointsPrograms PointsProgram[]
+  investments  Investment[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  householdId  String
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(member)
+  createdAt    DateTime @default(now())
+
+  household        Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  ownedTransactions Transaction[]     @relation("TransactionOwner")
+  importBatches    ImportBatch[]
+  defaultForAccounts FinancialAccount[] @relation("AccountDefaultOwner")
+  pointsPrograms   PointsProgram[]
+  investments      Investment[]
+
+  @@index([householdId])
+}
+
+model FinancialAccount {
+  id             String      @id @default(cuid())
+  householdId    String
+  name           String
+  type           AccountType
+  institution    String?
+  last4          String?
+  defaultOwnerId String?
+
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  defaultOwner  User?         @relation("AccountDefaultOwner", fields: [defaultOwnerId], references: [id])
+  transactions  Transaction[]
+
+  @@index([householdId])
+}
+
+model ImportBatch {
+  id           String       @id @default(cuid())
+  householdId  String
+  source       ImportSource
+  fileName     String
+  fileHash     String
+  importedById String
+  periodStart  DateTime?
+  periodEnd    DateTime?
+  totalRows    Int          @default(0)
+  importedRows Int          @default(0)
+  skippedRows  Int          @default(0)
+  createdAt    DateTime     @default(now())
+
+  household    Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  importedBy   User          @relation(fields: [importedById], references: [id])
+  transactions Transaction[]
+
+  @@index([householdId, fileHash])
+}
+
+model Transaction {
+  id             String         @id @default(cuid())
+  householdId    String
+  importBatchId  String?
+  accountId      String?
+  date           DateTime
+  description    String
+  rawDescription String?        @db.Text
+  amountCents    Int // + entrada / - saída
+  currency       String         @default("BRL")
+  fxAmountCents  Int?
+  fxCurrency     String?
+  categoryId     String?
+  categorySource CategorySource @default(uncategorized)
+  ownerId        String? // null = casal
+  installment    String?
+  dedupHash      String
+  createdAt      DateTime       @default(now())
+
+  household   Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  importBatch ImportBatch?      @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+  account     FinancialAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  category    Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  owner       User?             @relation("TransactionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  @@unique([householdId, dedupHash])
+  @@index([householdId, date])
+  @@index([householdId, categoryId])
+  @@index([householdId, ownerId])
+}
+
+model Category {
+  id          String       @id @default(cuid())
+  householdId String
+  name        String
+  kind        CategoryKind @default(expense)
+  color       String? // referencia token do tema, não hex cru
+  parentId    String?
+
+  household    Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  parent       Category?      @relation("CategoryParent", fields: [parentId], references: [id])
+  children     Category[]     @relation("CategoryParent")
+  transactions Transaction[]
+  rules        CategoryRule[]
+
+  @@unique([householdId, name])
+  @@index([householdId])
+}
+
+model CategoryRule {
+  id          String        @id @default(cuid())
+  householdId String
+  matchType   RuleMatchType @default(contains)
+  pattern     String
+  categoryId  String
+  priority    Int           @default(100)
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([householdId, priority])
+}
+
+model PointsProgram {
+  id          String            @id @default(cuid())
+  householdId String
+  name        PointsProgramName
+  ownerId     String?
+
+  household Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  owner     User?            @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  snapshots PointsSnapshot[]
+
+  @@index([householdId])
+}
+
+model PointsSnapshot {
+  id        String   @id @default(cuid())
+  programId String
+  balance   Int
+  date      DateTime
+  note      String?
+
+  program PointsProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId, date])
+}
+
+model Investment {
+  id            String         @id @default(cuid())
+  householdId   String
+  name          String
+  type          InvestmentType @default(cdb)
+  institution   String?
+  principalCents Int
+  appliedAt     DateTime
+  maturityAt    DateTime?
+  ownerId       String?
+
+  household Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  owner     User?                @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  snapshots InvestmentSnapshot[]
+
+  @@index([householdId])
+}
+
+model InvestmentSnapshot {
+  id           String   @id @default(cuid())
+  investmentId String
+  valueCents   Int
+  date         DateTime
+
+  investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  @@index([investmentId, date])
+}

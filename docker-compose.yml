@@ -1,0 +1,84 @@
+# Fintrix — dev/prod via Docker.
+# Portas parametrizadas por .env (ver docs/architecture.md §7) para NÃO colidir com
+# outros stacks do servidor (nutrix/codetrix/nginx-proxy-manager).
+# Defaults: app 3100, MySQL 3310, Adminer 8090. Rede isolada + prefixo fintrix_.
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: fintrix_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-fintrix_root}
+      MYSQL_DATABASE: ${DB_NAME:-fintrix}
+      MYSQL_USER: ${DB_USER:-fintrix}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-fintrix}
+    ports:
+      - "${DB_PORT:-3310}:3306"
+    volumes:
+      - fintrix_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-fintrix}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - fintrix_net
+
+  # Serviço one-shot: aplica as migrations (usa o estágio builder, com node_modules completo).
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: fintrix_migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql://${DB_USER:-fintrix}:${DB_PASSWORD:-fintrix}@db:3306/${DB_NAME:-fintrix}"
+    command: ["npx", "prisma", "migrate", "deploy"]
+    networks:
+      - fintrix_net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fintrix_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: "mysql://${DB_USER:-fintrix}:${DB_PASSWORD:-fintrix}@db:3306/${DB_NAME:-fintrix}"
+      AUTH_SECRET: ${AUTH_SECRET:?defina AUTH_SECRET no .env}
+      AUTH_TRUST_HOST: "true"
+      AUTH_URL: ${AUTH_URL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      NODE_ENV: production
+    ports:
+      - "${APP_PORT:-3100}:3000"
+    networks:
+      - fintrix_net
+
+  adminer:
+    image: adminer:latest
+    container_name: fintrix_adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${ADMINER_PORT:-8090}:8080"
+    networks:
+      - fintrix_net
+
+volumes:
+  fintrix_db_data:
+
+networks:
+  fintrix_net:
+    name: fintrix_net
