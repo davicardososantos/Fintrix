@@ -1,0 +1,51 @@
+# === Fintrix ===
+
+# Documentos pessoais (extratos/faturas reais) — NÃO versionar
+Exemplos/
+
+# Dependências
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# Build / Next.js
+/.next/
+/out/
+/build
+/dist
+next-env.d.ts
+
+# Ambiente / segredos
+.env
+.env*.local
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# Banco / Prisma
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testes / cobertura
+/coverage
+
+# Editor / SO
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Cache / diversos
+.turbo
+.vercel
+*.tsbuildinfo
