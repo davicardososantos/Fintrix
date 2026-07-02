@@ -1,11 +1,16 @@
-import { Placeholder } from "@/components/placeholder";
+import { ImportForm } from "./import-form";
 
 export default function ImportarPage() {
   return (
-    <Placeholder
-      title="Importar"
-      phase="Fase 2"
-      description="Upload de extrato C6 (conta e cartão) e Alelo, com deduplicação automática."
-    />
+    <div className="flex flex-col gap-5">
+      <div>
+        <h1 className="text-xl font-bold">Importar</h1>
+        <p className="text-sm text-muted-foreground">
+          Envie um extrato/fatura da C6 ou o extrato da Alelo. Linhas repetidas não são importadas de
+          novo.
+        </p>
+      </div>
+      <ImportForm />
+    </div>
   );
 }

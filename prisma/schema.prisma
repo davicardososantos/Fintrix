@@ -111,6 +111,7 @@ model FinancialAccount {
   defaultOwner  User?         @relation("AccountDefaultOwner", fields: [defaultOwnerId], references: [id])
   transactions  Transaction[]
 
+  @@unique([householdId, name])
   @@index([householdId])
 }
 
@@ -125,7 +126,8 @@ model ImportBatch {
   periodEnd    DateTime?
   totalRows    Int          @default(0)
   importedRows Int          @default(0)
-  skippedRows  Int          @default(0)
+  skippedRows  Int          @default(0) // duplicadas ignoradas pelo dedup
+  errorRows    Int          @default(0) // linhas inválidas puladas
   createdAt    DateTime     @default(now())
 
   household    Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
@@ -149,7 +151,9 @@ model Transaction {
   fxCurrency     String?
   categoryId     String?
   categorySource CategorySource @default(uncategorized)
+  rawCategory    String? // categoria original do arquivo (ex.: Categoria da fatura C6) — semente p/ Fase 3
   ownerId        String? // null = casal
+  ownerHint      String? // pista de pessoa do arquivo (ex.: Nome no Cartão) — usado na atribuição (Fase 3)
   installment    String?
   dedupHash      String
   createdAt      DateTime       @default(now())

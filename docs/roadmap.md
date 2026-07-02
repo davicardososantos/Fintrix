@@ -8,7 +8,7 @@ Documentação viva do projeto: constitution, PRD, architecture, data-model, the
 frontend-guidelines, pwa, roadmap, glossary, ADR-0001 e specs 001–006. Nenhum código de app.
 **Saída:** `docs/` completo + README.
 
-## Fase 1 — Scaffold técnico ✅ (atual)
+## Fase 1 — Scaffold técnico ✅
 Projeto Next.js 15 + TS, Docker Compose (`app`, `db` MySQL, `adminer` + serviço `migrate`),
 Tailwind + shadcn com o **tema aplicado** ([theme.md](./theme.md)), Prisma com schema inicial
 ([data-model.md](./data-model.md)), NextAuth (contas + Household, config dividida para o Edge),
@@ -17,10 +17,14 @@ Tailwind + shadcn com o **tema aplicado** ([theme.md](./theme.md)), Prisma com s
 Adminer 8090); login/logout funcionam (fluxo real testado ponta a ponta); tema Verde/Teal visível;
 migration inicial `init` aplicada. Bottom-nav e telas-placeholder das próximas fases no lugar.
 
-## Fase 2 — Importação (E1)
-Upload + detecção de fonte + parsers (C6 extrato, C6 fatura, Alelo PDF) + **dedup idempotente** +
-`ImportBatch` + tela de resumo. Spec: [001](./specs/001-importacao-arquivos/spec.md).
-**Saída:** importar os 3 arquivos de `Exemplos/Junho/`; reimportar não duplica.
+## Fase 2 — Importação (E1) ✅ (atual)
+Upload + detecção de fonte + parsers (C6 extrato, C6 fatura, Alelo PDF via pdf-parse) + **dedup
+idempotente** (`dedupHash` com `occurrenceIndex`) + `ImportBatch` + tela de resumo. Spec:
+[001](./specs/001-importacao-arquivos/spec.md).
+**Saída (verificada):** os 3 arquivos de `Exemplos/Junho/` importam (115 transações: 30 extrato +
+79 fatura + 6 Alelo, com sinais/categorias/ownerHint corretos); reimportar → **0 duplicadas**;
+dashboard mostra resumo + últimas transações. Categorização/atribuição reais ficam na Fase 3
+(por ora `rawCategory`/`ownerHint` são guardados como semente).
 
 ## Fase 3 — Categorização (E2) + Atribuição (E3)
 Categoria nativa C6 (semente) + regras + **Gemini** (fallback por regra) + edição manual; atribuição
