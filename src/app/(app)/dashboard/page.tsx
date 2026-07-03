@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Money } from "@/components/money";
 import { MonthNav } from "@/components/reports/month-nav";
 import { BarList } from "@/components/reports/bar-list";
+import { NetWorthCard } from "@/components/net-worth-card";
 import { LogOut, Upload, ArrowUpRight, ArrowDownRight, TrendingDown, TrendingUp } from "lucide-react";
 import { getSummary, getByCategory, getByPerson, getLatestMonthWithData } from "@/lib/reports/reports";
-import { monthRange, addMonths, parseMonthParam } from "@/lib/reports/date-range";
+import { getAccounts, getInvestments, getPointsPrograms } from "@/lib/portfolio";
+import { monthRange, addMonths, parseMonthParam, monthKeyToParam } from "@/lib/reports/date-range";
 
 export default async function DashboardPage({
   searchParams,
@@ -22,10 +24,25 @@ export default async function DashboardPage({
   const total = await prisma.transaction.count({ where: { householdId } });
   const household = await prisma.household.findUnique({ where: { id: householdId } });
 
+  const [{ totalBalanceCents }, { totalInvestedCents }, pointsPrograms] = await Promise.all([
+    getAccounts(householdId),
+    getInvestments(householdId),
+    getPointsPrograms(householdId),
+  ]);
+  const pointsTotal = pointsPrograms.reduce((s, p) => s + p.balance, 0);
+  const netWorth = (
+    <NetWorthCard
+      accountsCents={totalBalanceCents}
+      investmentsCents={totalInvestedCents}
+      pointsTotal={pointsTotal}
+    />
+  );
+
   if (total === 0) {
     return (
       <div className="flex flex-col gap-5">
         <Header name={session!.user.name} householdName={household?.name} />
+        {netWorth}
         <Card>
           <CardHeader>
             <CardTitle>Comece por aqui</CardTitle>
@@ -61,6 +78,7 @@ export default async function DashboardPage({
   return (
     <div className="flex flex-col gap-5">
       <Header name={session!.user.name} householdName={household?.name} />
+      {netWorth}
       <MonthNav current={current} />
 
       <Card>
@@ -128,8 +146,8 @@ export default async function DashboardPage({
                 pct: c.pct,
                 color: c.color,
                 href: c.categoryId
-                  ? `/transacoes?categoryId=${c.categoryId}`
-                  : "/transacoes?categoryId=none",
+                  ? `/transacoes?categoryId=${c.categoryId}&m=${monthKeyToParam(current)}`
+                  : `/transacoes?categoryId=none&m=${monthKeyToParam(current)}`,
               }))}
             />
           </CardContent>

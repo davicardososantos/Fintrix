@@ -18,6 +18,18 @@ export function formatSignedCents(cents: number, currency = "BRL"): string {
 }
 
 /**
+ * Formato compacto para rótulos de gráfico. Ex.: 685075 -> "6,9k", 42000 -> "420".
+ * Sempre em reais (não centavos) e sem prefixo de moeda, para caber em labels apertados.
+ */
+export function formatCompactCents(cents: number): string {
+  const v = Math.abs(cents) / 100;
+  if (v >= 1000) {
+    return `${(v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}k`;
+  }
+  return v.toLocaleString("pt-BR", { maximumFractionDigits: 0 });
+}
+
+/**
  * Converte string de valor para centavos inteiros.
  * Aceita ponto ("4.28") ou vírgula ("R$ 4,28") como separador decimal.
  */

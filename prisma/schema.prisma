@@ -108,6 +108,8 @@ model FinancialAccount {
   institution    String?
   last4          String?
   defaultOwnerId String?
+  balanceCents     Int? // saldo atual informado manualmente (null = não informado)
+  balanceUpdatedAt DateTime? // quando o saldo foi atualizado pela última vez
 
   household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
   defaultOwner  User?         @relation("AccountDefaultOwner", fields: [defaultOwnerId], references: [id])

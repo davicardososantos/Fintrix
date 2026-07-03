@@ -1,5 +1,46 @@
 import { prisma } from "@/lib/db";
-import type { PointsProgramName } from "@prisma/client";
+import type { PointsProgramName, AccountType } from "@prisma/client";
+
+export const ACCOUNT_LABEL: Record<AccountType, string> = {
+  checking: "Conta corrente",
+  credit_card: "Cartão de crédito",
+  meal_voucher: "Vale-refeição",
+  cash: "Dinheiro",
+  other: "Outra",
+};
+
+export type AccountView = {
+  id: string;
+  name: string;
+  type: AccountType;
+  typeLabel: string;
+  institution: string | null;
+  balanceCents: number | null;
+  balanceUpdatedAt: string | null;
+};
+
+/** Contas/carteiras do household com saldo atual informado + total dos saldos conhecidos. */
+export async function getAccounts(
+  householdId: string,
+): Promise<{ accounts: AccountView[]; totalBalanceCents: number }> {
+  const rows = await prisma.financialAccount.findMany({
+    where: { householdId },
+    orderBy: [{ type: "asc" }, { name: "asc" }],
+  });
+
+  const accounts: AccountView[] = rows.map((a) => ({
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    typeLabel: ACCOUNT_LABEL[a.type],
+    institution: a.institution,
+    balanceCents: a.balanceCents,
+    balanceUpdatedAt: a.balanceUpdatedAt ? a.balanceUpdatedAt.toISOString() : null,
+  }));
+
+  const totalBalanceCents = accounts.reduce((s, a) => s + (a.balanceCents ?? 0), 0);
+  return { accounts, totalBalanceCents };
+}
 
 export const POINTS_LABEL: Record<PointsProgramName, string> = {
   smiles: "Smiles",

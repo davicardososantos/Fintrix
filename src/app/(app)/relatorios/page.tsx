@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
 import { MonthNav } from "@/components/reports/month-nav";
 import { BarList } from "@/components/reports/bar-list";
-import { MonthlyBars } from "@/components/reports/monthly-bars";
+import { IncomeExpenseChart } from "@/components/reports/income-expense-chart";
 import { PersonFilter } from "@/components/reports/person-filter";
 import {
   getSummary,
@@ -61,7 +61,7 @@ export default async function RelatoriosPage({
   ];
 
   const drill = (categoryPart: string) => {
-    const parts = [categoryPart];
+    const parts = [categoryPart, `m=${monthKeyToParam(current)}`];
     if (sp.person === "casal") parts.push("ownerId=casal");
     else if (sp.person) parts.push("ownerId=" + sp.person);
     return `/transacoes?${parts.join("&")}`;
@@ -80,14 +80,19 @@ export default async function RelatoriosPage({
         <SummaryTile label="Saldo" cents={summary.balanceCents} />
       </div>
 
-      {/* Evolução mensal */}
+      {/* Evolução mensal: entradas x gastos */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm text-muted-foreground">Evolução dos gastos</CardTitle>
+          <CardTitle className="text-sm text-muted-foreground">Entradas x Gastos</CardTitle>
         </CardHeader>
         <CardContent>
-          <MonthlyBars
-            points={series.map((s) => ({ key: s.key, label: s.label, expenseCents: s.expenseCents }))}
+          <IncomeExpenseChart
+            points={series.map((s) => ({
+              key: s.key,
+              label: s.label,
+              incomeCents: s.incomeCents,
+              expenseCents: s.expenseCents,
+            }))}
             activeParam={monthKeyToParam(current)}
           />
         </CardContent>

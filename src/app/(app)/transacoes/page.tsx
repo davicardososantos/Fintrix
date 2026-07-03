@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Filters } from "@/components/transactions/filters";
 import { TransactionItem, type TransactionDTO } from "@/components/transactions/transaction-item";
 import { RecategorizeButton } from "@/components/transactions/recategorize-button";
+import { MonthNav } from "@/components/reports/month-nav";
+import { getLatestMonthWithData } from "@/lib/reports/reports";
+import { monthRange, parseMonthParam, type MonthKey } from "@/lib/reports/date-range";
 
 export default async function TransacoesPage({
   searchParams,
@@ -14,13 +17,20 @@ export default async function TransacoesPage({
     categoryId?: string;
     ownerId?: string;
     accountId?: string;
+    m?: string;
   }>;
 }) {
   const session = await auth();
   const householdId = session!.user.householdId;
   const sp = await searchParams;
 
-  const where: Prisma.TransactionWhereInput = { householdId };
+  // Mês selecionado (‹ mês ›). Default: mês mais recente com dados, ou o mês atual.
+  const now = new Date();
+  const latest = await getLatestMonthWithData(householdId);
+  const current: MonthKey =
+    parseMonthParam(sp.m) ?? latest ?? { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
+
+  const where: Prisma.TransactionWhereInput = { householdId, date: monthRange(current) };
   if (sp.q) where.description = { contains: sp.q };
   if (sp.categoryId === "none") where.categoryId = null;
   else if (sp.categoryId) where.categoryId = sp.categoryId;
@@ -32,7 +42,7 @@ export default async function TransacoesPage({
     prisma.transaction.findMany({
       where,
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-      take: 200,
+      take: 500,
       include: { category: true, account: true, owner: true },
     }),
     prisma.category.findMany({ where: { householdId }, orderBy: { name: "asc" } }),
@@ -63,6 +73,8 @@ export default async function TransacoesPage({
         <RecategorizeButton />
       </div>
 
+      <MonthNav current={current} />
+
       <Filters
         options={{
           categories: categories.map((c) => ({ id: c.id, name: c.name })),
@@ -71,11 +83,11 @@ export default async function TransacoesPage({
         }}
       />
 
-      <p className="text-xs text-muted-foreground">{dtos.length} transações</p>
+      <p className="text-xs text-muted-foreground">{dtos.length} transações no mês</p>
 
       {dtos.length === 0 ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">
-          Nenhuma transação para os filtros escolhidos.
+          Nenhuma transação neste mês para os filtros escolhidos.
         </Card>
       ) : (
         <Card>
