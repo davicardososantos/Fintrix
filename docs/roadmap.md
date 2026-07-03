@@ -17,7 +17,7 @@ Tailwind + shadcn com o **tema aplicado** ([theme.md](./theme.md)), Prisma com s
 Adminer 8090); login/logout funcionam (fluxo real testado ponta a ponta); tema Verde/Teal visível;
 migration inicial `init` aplicada. Bottom-nav e telas-placeholder das próximas fases no lugar.
 
-## Fase 2 — Importação (E1) ✅ (atual)
+## Fase 2 — Importação (E1) ✅
 Upload + detecção de fonte + parsers (C6 extrato, C6 fatura, Alelo PDF via pdf-parse) + **dedup
 idempotente** (`dedupHash` com `occurrenceIndex`) + `ImportBatch` + tela de resumo. Spec:
 [001](./specs/001-importacao-arquivos/spec.md).
@@ -26,11 +26,15 @@ idempotente** (`dedupHash` com `occurrenceIndex`) + `ImportBatch` + tela de resu
 dashboard mostra resumo + últimas transações. Categorização/atribuição reais ficam na Fase 3
 (por ora `rawCategory`/`ownerHint` são guardados como semente).
 
-## Fase 3 — Categorização (E2) + Atribuição (E3)
-Categoria nativa C6 (semente) + regras + **Gemini** (fallback por regra) + edição manual; atribuição
-eu/esposa/casal (auto pela fatura). Specs: [002](./specs/002-transacoes-categorizacao/spec.md),
+## Fase 3 — Categorização (E2) + Atribuição (E3) ✅ (atual)
+Categoria nativa C6 (semente) + regras + **Gemini** (`gemini-3.1-flash-lite`, com fallback por
+regra) + edição manual; atribuição eu/esposa/casal (auto pela fatura via `ownerHint`). Categorização
+roda após o import e sob demanda. Specs: [002](./specs/002-transacoes-categorizacao/spec.md),
 [003](./specs/003-atribuicao-pessoa/spec.md).
-**Saída:** ≥ 80% categorizado automático; reatribuir/recategorizar pela UI.
+**Saída (verificada):** **100%** categorizado automático nas 115 transações (76 C6 + 38 regra +
+1 IA); edição manual de categoria/pessoa **sobrevive** à recategorização (precedência `manual`);
+regra retroativa; filtros (texto/categoria/pessoa/conta); adicionar cônjuge (`/mais`). Migration
+`owner_manual` aplicada.
 
 ## Fase 4 — Dashboard + Relatórios (E6)
 Resumo do mês, relatórios por categoria/pessoa/mês, evolução mês-a-mês, filtros. É o coração

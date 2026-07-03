@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { importBuffer, ImportError, type ImportSummary } from "@/lib/import/import-service";
+import { categorizeHousehold } from "@/lib/categorization/pipeline";
 
 export type ImportState = {
   ok?: boolean;
@@ -34,6 +35,14 @@ export async function importFileAction(
       file.name,
       buffer,
     );
+    // Categoriza/atribui as transações novas (não bloqueia o import: falha da IA cai no fallback).
+    if (summary.imported > 0) {
+      try {
+        await categorizeHousehold(session.user.householdId);
+      } catch (e) {
+        console.error("[import] categorização pós-import falhou (segue sem travar):", e);
+      }
+    }
     revalidatePath("/dashboard");
     revalidatePath("/transacoes");
     return { ok: true, summary };

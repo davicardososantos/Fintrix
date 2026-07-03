@@ -59,6 +59,7 @@ services:
       AUTH_TRUST_HOST: "true"
       AUTH_URL: ${AUTH_URL:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.1-flash-lite}
       NODE_ENV: production
     ports:
       - "${APP_PORT:-3100}:3000"
