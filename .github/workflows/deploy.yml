@@ -1,29 +1,46 @@
-# name: Deploy to Hostinger VPS
+name: Deploy Fintrix (Hostinger VPS)
 
-# on:
-#   push:
-#     branches:
-#       - main  # O deploy será executado quando fizer push na branch main
+# Dispara no push para a main (ou manualmente em Actions → Run workflow).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+# Evita dois deploys rodando ao mesmo tempo.
+concurrency:
+  group: deploy-fintrix
+  cancel-in-progress: true
 
-#     steps:
-#       - name: Checkout do código
-#         uses: actions/checkout@v3
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-#       - name: Configurar SSH
-#         run: |
-#             mkdir -p ~/.ssh
-#             echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-#             chmod 600 ~/.ssh/id_rsa
-#             ssh-keyscan -H ${{ secrets.HOSTINGER_IP }} >> ~/.ssh/known_hosts
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          PORT="${{ secrets.SSH_PORT }}"
+          ssh-keyscan -p "${PORT:-22}" -H "${{ secrets.HOSTINGER_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
 
-#       - name: Subir arquivos para o servidor
-#         run: |
-#             rsync -avz ./app/ root@${{ secrets.HOSTINGER_IP }}:/root/fintrix/
+      - name: Enviar arquivos para o servidor (rsync)
+        run: |
+          PORT="${{ secrets.SSH_PORT }}"
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='.env' \
+            --exclude='Exemplos' \
+            -e "ssh -i ~/.ssh/id_deploy -p ${PORT:-22}" \
+            ./ "${{ secrets.SSH_USER }}@${{ secrets.HOSTINGER_IP }}:${{ secrets.DEPLOY_PATH }}/"
 
-#       - name: Ajustar permissões do storage e cache
-#         run: |
-#             ssh root@${{ secrets.HOSTINGER_IP }} 'docker exec codetrix_app chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache'
+      - name: Build e subir containers
+        run: |
+          PORT="${{ secrets.SSH_PORT }}"
+          ssh -i ~/.ssh/id_deploy -p "${PORT:-22}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.HOSTINGER_IP }}" \
+            "cd '${{ secrets.DEPLOY_PATH }}' && docker compose up -d --build --remove-orphans && docker image prune -f"
