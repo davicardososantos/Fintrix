@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { signIn } from "@/lib/auth";
 
 const registerSchema = z.object({
-  householdName: z.string().min(2, "Nome do casal muito curto"),
+  householdName: z.string().min(2, "Nome da família muito curto"),
   name: z.string().min(2, "Informe seu nome"),
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "Senha precisa de ao menos 6 caracteres"),

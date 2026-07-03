@@ -105,7 +105,7 @@ export async function getByPerson(
 
   const slices = grouped.map((g) => ({
     ownerId: g.ownerId,
-    name: g.ownerId ? (nameById.get(g.ownerId) ?? "—") : "Casal",
+    name: g.ownerId ? (nameById.get(g.ownerId) ?? "—") : "Família",
     totalCents: Math.abs(g._sum.amountCents ?? 0),
     pct: 0,
   }));

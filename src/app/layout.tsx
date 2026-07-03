@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Fintrix",
-  description: "Gestão financeira do casal",
+  description: "Gestão financeira da família",
   applicationName: "Fintrix",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Fintrix" },

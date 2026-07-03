@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useActionState } from "react";
 import { registerAction, type ActionState } from "@/lib/actions/auth-actions";
 import { Button } from "@/components/ui/button";
@@ -8,18 +9,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Cadastro público temporariamente DESABILITADO — as contas são criadas manualmente (SQL).
+// O código abaixo é mantido de propósito para reativar no futuro (basta ligar a flag).
+const REGISTRATION_ENABLED: boolean = false;
+
 export default function RegisterPage() {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     registerAction,
     undefined,
   );
 
+  if (!REGISTRATION_ENABLED) redirect("/login");
+
   return (
     <Card>
       <CardContent className="pt-6">
         <form action={formAction} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="householdName">Nome do casal</Label>
+            <Label htmlFor="householdName">Nome da família</Label>
             <Input id="householdName" name="householdName" placeholder="Ex.: Casa Davi & Ana" required />
           </div>
           <div className="flex flex-col gap-1.5">

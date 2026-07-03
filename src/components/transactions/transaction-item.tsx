@@ -116,7 +116,7 @@ export function TransactionItem({
               <div className="grid grid-cols-3 gap-2">
                 <PersonBtn
                   active={tx.ownerId === null}
-                  label="Casal"
+                  label="Família"
                   pending={pending}
                   onClick={() => startTransition(() => updateOwnerAction(tx.id, null))}
                 />

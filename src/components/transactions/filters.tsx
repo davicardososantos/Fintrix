@@ -56,7 +56,7 @@ export function Filters({ options }: { options: FilterOptions }) {
           className={selectCls}
         >
           <option value="">Pessoa</option>
-          <option value="casal">Casal</option>
+          <option value="casal">Família</option>
           {options.users.map((u) => (
             <option key={u.id} value={u.id}>
               {u.name.split(" ")[0]}

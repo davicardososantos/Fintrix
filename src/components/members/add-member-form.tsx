@@ -17,7 +17,7 @@ export function AddMemberForm() {
   return (
     <form ref={formRef} action={action} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="m-name">Nome do(a) cônjuge</Label>
+        <Label htmlFor="m-name">Nome do membro</Label>
         <Input id="m-name" name="name" placeholder="Ex.: Ana" required />
       </div>
       <div className="flex flex-col gap-1.5">
@@ -31,7 +31,7 @@ export function AddMemberForm() {
       {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
       {state?.ok && <p className="text-sm text-positive">Membro adicionado!</p>}
       <Button type="submit" disabled={pending}>
-        {pending ? "Adicionando..." : "Adicionar ao casal"}
+        {pending ? "Adicionando..." : "Adicionar à família"}
       </Button>
     </form>
   );

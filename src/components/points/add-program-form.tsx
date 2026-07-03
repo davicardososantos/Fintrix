@@ -26,7 +26,7 @@ export function AddProgramForm({ users }: { users: { id: string; name: string }[
           <option value="latam">LATAM Pass</option>
         </select>
         <select name="ownerId" defaultValue="casal" className={cls}>
-          <option value="casal">Casal</option>
+          <option value="casal">Família</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
               {u.name.split(" ")[0]}

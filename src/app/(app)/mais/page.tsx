@@ -23,7 +23,7 @@ export default async function MaisPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4 text-primary" /> Membros do casal
+            <Users className="h-4 w-4 text-primary" /> Membros da família
           </CardTitle>
         </CardHeader>
         <ul className="divide-y divide-border">
@@ -41,10 +41,10 @@ export default async function MaisPage() {
         </ul>
       </Card>
 
-      {isOwner && members.length < 2 && (
+      {isOwner && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Adicionar cônjuge</CardTitle>
+            <CardTitle className="text-base">Adicionar membro</CardTitle>
           </CardHeader>
           <CardContent>
             <AddMemberForm />

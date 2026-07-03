@@ -56,7 +56,7 @@ export default async function RelatoriosPage({
 
   const personOptions = [
     { value: "", label: "Todos" },
-    { value: "casal", label: "Casal" },
+    { value: "casal", label: "Família" },
     ...users.map((u) => ({ value: u.id, label: u.name.split(" ")[0] })),
   ];
 
