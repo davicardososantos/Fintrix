@@ -1,6 +1,7 @@
 // Tipos compartilhados da importação (spec 001).
 
-export type ImportSource = "c6_extrato" | "c6_fatura" | "alelo";
+// (santander_conta existe no enum do Prisma, reservado para o futuro, mas ainda não é gerado aqui)
+export type ImportSource = "c6_extrato" | "c6_fatura" | "alelo" | "nubank_conta";
 
 /** Chave estável da conta/fonte, derivada do parse (usada no dedup e para achar/criar a conta). */
 export type AccountKey = {
@@ -23,6 +24,7 @@ export type ParsedTransaction = {
   rawCategory?: string; // Categoria original (fatura C6)
   ownerHint?: string; // Nome no Cartão (fatura)
   installment?: string;
+  externalId?: string; // id único do provedor (ex.: UUID do Nubank) — usado no dedup
 };
 
 /** Resultado de um parser: transações + a conta + período + linhas com erro. */

@@ -24,7 +24,7 @@ export function ImportForm() {
           <UploadCloud className="h-8 w-8 text-primary" />
           <span className="text-sm font-medium">Toque para escolher um arquivo</span>
           <span className="text-xs text-muted-foreground">
-            Extrato ou Fatura C6 (.csv) · Extrato Alelo (.pdf)
+            Extrato/Fatura C6 e Nubank (.csv) · Extrato Alelo (.pdf)
           </span>
           <input
             ref={inputRef}

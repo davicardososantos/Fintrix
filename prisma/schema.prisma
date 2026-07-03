@@ -29,6 +29,8 @@ enum ImportSource {
   c6_extrato
   c6_fatura
   alelo
+  nubank_conta
+  santander_conta // reservado (Santander virá depois)
 }
 
 enum CategoryKind {

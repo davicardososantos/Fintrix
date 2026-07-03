@@ -14,33 +14,48 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      SSH_HOST: ${{ secrets.HOSTINGER_IP }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Configurar chave SSH
+      - name: Configurar SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          # Escreve a chave garantindo LF e newline final (evita corrupção por CRLF do Windows).
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          PORT="${{ secrets.SSH_PORT }}"
-          ssh-keyscan -p "${PORT:-22}" -H "${{ secrets.HOSTINGER_IP }}" >> ~/.ssh/known_hosts 2>/dev/null
+          cat > ~/.ssh/config <<EOF
+          Host deploy
+            HostName $SSH_HOST
+            User $SSH_USER
+            Port ${SSH_PORT:-22}
+            IdentityFile ~/.ssh/id_deploy
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+            BatchMode yes
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Testar conexão SSH
+        run: ssh deploy 'echo "Conectado como $(whoami) em $(hostname)"'
 
       - name: Enviar arquivos para o servidor (rsync)
         run: |
-          PORT="${{ secrets.SSH_PORT }}"
           rsync -az --delete \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='.next' \
             --exclude='.env' \
             --exclude='Exemplos' \
-            -e "ssh -i ~/.ssh/id_deploy -p ${PORT:-22}" \
-            ./ "${{ secrets.SSH_USER }}@${{ secrets.HOSTINGER_IP }}:${{ secrets.DEPLOY_PATH }}/"
+            -e ssh ./ "deploy:${DEPLOY_PATH}/"
 
       - name: Build e subir containers
         run: |
-          PORT="${{ secrets.SSH_PORT }}"
-          ssh -i ~/.ssh/id_deploy -p "${PORT:-22}" \
-            "${{ secrets.SSH_USER }}@${{ secrets.HOSTINGER_IP }}" \
-            "cd '${{ secrets.DEPLOY_PATH }}' && docker compose up -d --build --remove-orphans && docker image prune -f"
+          ssh deploy "cd '${DEPLOY_PATH}' && docker compose up -d --build --remove-orphans && docker image prune -f"

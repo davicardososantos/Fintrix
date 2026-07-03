@@ -18,6 +18,7 @@ const SOURCE_LABEL: Record<string, string> = {
   c6_extrato: "Extrato C6",
   c6_fatura: "Fatura C6",
   alelo: "Alelo",
+  nubank_conta: "Nubank",
 };
 
 /**

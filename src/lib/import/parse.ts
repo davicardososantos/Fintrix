@@ -2,6 +2,7 @@ import { detectSource } from "./detect";
 import { parseExtrato } from "./extrato";
 import { parseFatura } from "./fatura";
 import { parseAlelo } from "./alelo";
+import { parseNubank } from "./nubank";
 import type { ParseResult } from "./types";
 
 export class ImportError extends Error {}
@@ -27,7 +28,8 @@ export async function parseFile(buffer: Buffer, fileName: string): Promise<Parse
 
   if (!source) {
     throw new ImportError(
-      "Arquivo não reconhecido. Envie um extrato ou fatura da C6 (CSV) ou o extrato Alelo (PDF).",
+      "Arquivo não reconhecido. Envie: extrato ou fatura C6 (CSV), extrato Nubank (CSV) " +
+        "ou o extrato Alelo (PDF).",
     );
   }
 
@@ -38,5 +40,7 @@ export async function parseFile(buffer: Buffer, fileName: string): Promise<Parse
       return parseFatura(text);
     case "alelo":
       return parseAlelo(text);
+    case "nubank_conta":
+      return parseNubank(text);
   }
 }

@@ -67,8 +67,12 @@ export const DEFAULT_RULES: { pattern: string; category: string; priority: numbe
   { pattern: "INCLUSAO DE PAGAMENTO", category: "Transferências", priority: 10 },
   { pattern: "PIX ENVIADO", category: "Transferências", priority: 30 },
   { pattern: "TRANSF ENVIADA", category: "Transferências", priority: 30 },
+  { pattern: "TRANSFERENCIA ENVIADA", category: "Transferências", priority: 30 },
   { pattern: "PIX RECEBIDO", category: "Renda", priority: 30 },
+  { pattern: "TRANSFERENCIA RECEBIDA", category: "Renda", priority: 30 },
   { pattern: "BENEFICIO", category: "Renda", priority: 10 },
+  { pattern: "REMUNERACAO", category: "Renda", priority: 20 },
+  { pattern: "RENDIMENTO", category: "Renda", priority: 20 },
 ];
 
 /** Cria (se não existirem) as categorias-semente e retorna um mapa nome → id. */
