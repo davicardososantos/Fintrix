@@ -55,10 +55,14 @@ Specs: [004](./specs/004-pontos/spec.md), [005](./specs/005-investimentos/spec.m
 **Saída (verificada):** criar programa + registrar saldo (Smiles 18.500, variação +3.500); cadastrar
 CDB C6 (principal R$5.000 → atual R$5.200, rendimento +R$200 / 4%); total investido somado.
 
-## Fase 6 — PWA + polimento mobile
-Manifest, service worker, ícones, offline básico, instalação; refino de cara de app. Guia:
-[pwa.md](./pwa.md).
-**Saída:** instalável no Android/iOS; Lighthouse PWA ok.
+## Fase 6 — PWA + polimento mobile ✅ (atual — MVP completo)
+Manifest, service worker (network-first p/ páginas, cache-first p/ assets, offline básico), ícones
+(192/512/maskable/apple gerados com sharp), meta tags (theme-color light/dark, viewport-fit=cover,
+iOS), registro do SW e prompt de instalação (`beforeinstallprompt`). Guia: [pwa.md](./pwa.md).
+**Saída (verificada headless):** `manifest.webmanifest` (200, `application/manifest+json`, 3 ícones,
+`display: standalone`, `start_url: /dashboard`), `sw.js` (200), 4 ícones PNG (200); HTML referencia
+manifest + apple-touch-icon + theme-color. Middleware libera os artefatos do PWA sem auth.
+_Pendente de device real:_ instalar no Android/iOS e rodar Lighthouse PWA (requer navegador/HTTPS).
 
 ## Futuro (fora do MVP)
 Open Finance/integração automática, metas/orçamento, push, projeções, exportação, empacotamento nas

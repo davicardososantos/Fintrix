@@ -25,6 +25,6 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Roda em tudo, exceto assets estáticos e imagens.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icons).*)"],
+  // Roda em tudo, exceto assets estáticos, imagens e artefatos do PWA (sw.js, manifest, ícones).
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons|logo.png).*)"],
 };
