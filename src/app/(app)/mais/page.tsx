@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddMemberForm } from "@/components/members/add-member-form";
-import { Tags, Users } from "lucide-react";
+import { Tags, Users, Plane, TrendingUp } from "lucide-react";
 
 export default async function MaisPage() {
   const session = await auth();
@@ -52,21 +52,37 @@ export default async function MaisPage() {
         </Card>
       )}
 
-      <Link href="/categorias">
-        <Card className="transition-colors active:bg-muted">
-          <CardContent className="flex items-center gap-3 pt-6">
-            <Tags className="h-5 w-5 text-primary" />
-            <div>
-              <p className="font-medium">Categorias</p>
-              <p className="text-xs text-muted-foreground">Gerenciar categorias e cores</p>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-
-      <p className="px-1 text-xs text-muted-foreground">
-        Pontos e investimentos chegam na Fase 5.
-      </p>
+      <div className="flex flex-col gap-3">
+        <NavCard href="/pontos" icon={<Plane className="h-5 w-5 text-points" />} title="Pontos" desc="Smiles, Livelo, TudoAzul, LATAM" />
+        <NavCard href="/investimentos" icon={<TrendingUp className="h-5 w-5 text-investment" />} title="Investimentos" desc="CDB e outros — acompanhe o rendimento" />
+        <NavCard href="/categorias" icon={<Tags className="h-5 w-5 text-primary" />} title="Categorias" desc="Gerenciar categorias e cores" />
+      </div>
     </div>
+  );
+}
+
+function NavCard({
+  href,
+  icon,
+  title,
+  desc,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <Link href={href}>
+      <Card className="transition-colors active:bg-muted">
+        <CardContent className="flex items-center gap-3 pt-6">
+          {icon}
+          <div>
+            <p className="font-medium">{title}</p>
+            <p className="text-xs text-muted-foreground">{desc}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

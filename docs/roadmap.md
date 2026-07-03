@@ -36,7 +36,7 @@ roda após o import e sob demanda. Specs: [002](./specs/002-transacoes-categoriz
 regra retroativa; filtros (texto/categoria/pessoa/conta); adicionar cônjuge (`/mais`). Migration
 `owner_manual` aplicada.
 
-## Fase 4 — Dashboard + Relatórios (E6) ✅ (atual)
+## Fase 4 — Dashboard + Relatórios (E6) ✅
 Resumo do mês (com **navegação de mês**), relatórios por categoria/pessoa, evolução mês-a-mês
 (barras), filtros (mês + pessoa) e **drill-down** para `/transacoes`. É o coração (decisão). Spec:
 [006](./specs/006-dashboard-relatorios/spec.md).
@@ -46,10 +46,14 @@ pessoa e por categoria (com drill-down) e filtro por pessoa. Regra de contagem e
 transferências/pagamento de fatura (sem dupla contagem). Charts em CSS puro usando tokens do tema
 (sem lib extra).
 
-## Fase 5 — Pontos (E4) + Investimentos (E5)
-Pontos (Smiles, Livelo, Azul, Latam) com atualização manual; investimentos (CDB C6) com registro e
-valor atual. Specs: [004](./specs/004-pontos/spec.md), [005](./specs/005-investimentos/spec.md).
-**Saída:** acompanhar saldos de pontos e patrimônio investido.
+## Fase 5 — Pontos (E4) + Investimentos (E5) ✅ (atual)
+Pontos (Smiles, Livelo, TudoAzul, LATAM Pass) com atualização manual de saldo (snapshots),
+variação vs. leitura anterior e histórico; investimentos (CDB e outros) com principal, valor atual
+(snapshots), **rendimento** (R$ e %) e **total investido**. Ambos com dono (eu/esposa/casal) e
+telas em `/pontos` e `/investimentos` (acessíveis via `/mais`). Sem migration (entidades já existiam).
+Specs: [004](./specs/004-pontos/spec.md), [005](./specs/005-investimentos/spec.md).
+**Saída (verificada):** criar programa + registrar saldo (Smiles 18.500, variação +3.500); cadastrar
+CDB C6 (principal R$5.000 → atual R$5.200, rendimento +R$200 / 4%); total investido somado.
 
 ## Fase 6 — PWA + polimento mobile
 Manifest, service worker, ícones, offline básico, instalação; refino de cara de app. Guia:
