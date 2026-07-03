@@ -26,7 +26,7 @@ idempotente** (`dedupHash` com `occurrenceIndex`) + `ImportBatch` + tela de resu
 dashboard mostra resumo + últimas transações. Categorização/atribuição reais ficam na Fase 3
 (por ora `rawCategory`/`ownerHint` são guardados como semente).
 
-## Fase 3 — Categorização (E2) + Atribuição (E3) ✅ (atual)
+## Fase 3 — Categorização (E2) + Atribuição (E3) ✅
 Categoria nativa C6 (semente) + regras + **Gemini** (`gemini-3.1-flash-lite`, com fallback por
 regra) + edição manual; atribuição eu/esposa/casal (auto pela fatura via `ownerHint`). Categorização
 roda após o import e sob demanda. Specs: [002](./specs/002-transacoes-categorizacao/spec.md),
@@ -36,10 +36,15 @@ roda após o import e sob demanda. Specs: [002](./specs/002-transacoes-categoriz
 regra retroativa; filtros (texto/categoria/pessoa/conta); adicionar cônjuge (`/mais`). Migration
 `owner_manual` aplicada.
 
-## Fase 4 — Dashboard + Relatórios (E6)
-Resumo do mês, relatórios por categoria/pessoa/mês, evolução mês-a-mês, filtros. É o coração
-(decisão). Spec: [006](./specs/006-dashboard-relatorios/spec.md).
-**Saída:** responder "onde gastamos mais", "quem gastou mais", "reduzimos vs. mês passado?".
+## Fase 4 — Dashboard + Relatórios (E6) ✅ (atual)
+Resumo do mês (com **navegação de mês**), relatórios por categoria/pessoa, evolução mês-a-mês
+(barras), filtros (mês + pessoa) e **drill-down** para `/transacoes`. É o coração (decisão). Spec:
+[006](./specs/006-dashboard-relatorios/spec.md).
+**Saída (verificada):** dashboard mostra saldo/entrou/saiu do mês + **delta vs. mês anterior** +
+placar "quem gastou mais" + top categorias; `/relatorios` traz evolução de 6 meses, gastos por
+pessoa e por categoria (com drill-down) e filtro por pessoa. Regra de contagem exclui
+transferências/pagamento de fatura (sem dupla contagem). Charts em CSS puro usando tokens do tema
+(sem lib extra).
 
 ## Fase 5 — Pontos (E4) + Investimentos (E5)
 Pontos (Smiles, Livelo, Azul, Latam) com atualização manual; investimentos (CDB C6) com registro e

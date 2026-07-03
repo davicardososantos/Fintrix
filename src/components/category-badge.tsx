@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 // Mapa estático token→classe (Tailwind não aceita classe dinâmica). Tokens vêm do tema.
-const DOT: Record<string, string> = {
+export const TOKEN_BG: Record<string, string> = {
   primary: "bg-primary",
   accent: "bg-accent",
   investment: "bg-investment",
@@ -9,6 +9,13 @@ const DOT: Record<string, string> = {
   warning: "bg-warning",
   muted: "bg-muted-foreground",
 };
+
+/** Classe de background para um token de cor de categoria (fallback: muted). */
+export function tokenBg(color?: string | null): string {
+  return TOKEN_BG[color ?? "muted"] ?? TOKEN_BG.muted;
+}
+
+const DOT = TOKEN_BG;
 
 export function CategoryBadge({
   name,
