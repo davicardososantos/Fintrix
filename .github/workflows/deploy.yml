@@ -57,5 +57,14 @@ jobs:
             -e ssh ./ "deploy:${DEPLOY_PATH}/"
 
       - name: Build e subir containers
+        # docker-compose v1 (1.29.2) tem o bug KeyError 'ContainerConfig' ao RECRIAR um container
+        # cuja imagem mudou (estoura no one-shot fintrix_migrate). Workaround: build → down → up,
+        # recriando do zero em vez de recriar no lugar. O build roda com o app ainda no ar, então
+        # o downtime é só a janela entre down e up. Usa `docker compose` (v2) se existir; senão v1.
         run: |
-          ssh deploy "cd '${DEPLOY_PATH}' && docker-compose up -d --build --remove-orphans && docker image prune -f"
+          ssh deploy "cd '${DEPLOY_PATH}' && \
+            if docker compose version >/dev/null 2>&1; then DC='docker compose'; else DC='docker-compose'; fi && \
+            \$DC build && \
+            \$DC down --remove-orphans && \
+            \$DC up -d && \
+            docker image prune -f"
