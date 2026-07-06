@@ -40,11 +40,22 @@ jobs:
             IdentitiesOnly yes
             StrictHostKeyChecking accept-new
             BatchMode yes
+            ConnectTimeout 15
+            ServerAliveInterval 15
+            ServerAliveCountMax 4
           EOF
           chmod 600 ~/.ssh/config
 
-      - name: Testar conexão SSH
-        run: ssh deploy 'echo "Conectado como $(whoami) em $(hostname)"'
+      - name: Testar conexão SSH (com retry)
+        # O "Connection timed out" do run #7 costuma ser blip de rede transitório — tenta 5x.
+        run: |
+          for i in 1 2 3 4 5; do
+            if ssh deploy 'echo "Conectado como $(whoami) em $(hostname)"'; then exit 0; fi
+            echo "Tentativa $i falhou; aguardando 15s..." >&2
+            sleep 15
+          done
+          echo "SSH indisponível após 5 tentativas." >&2
+          exit 1
 
       - name: Enviar arquivos para o servidor (rsync)
         run: |
@@ -56,7 +67,8 @@ jobs:
             --exclude='Exemplos' \
             -e ssh ./ "deploy:${DEPLOY_PATH}/"
 
-      - name: Build e subir containers
-        # A lógica de deploy vive em scripts/deploy.sh (versionado) para evitar inferno de aspas no
-        # YAML e para dar log visível das migrations. Ver comentários no próprio script.
+      - name: Deploy gated (build → migration → recria → healthcheck)
+        # A lógica vive em scripts/deploy.sh (versionado) para evitar inferno de aspas no YAML e dar
+        # log visível das migrations. O script NÃO derruba o app antigo até a migration passar, e
+        # falha o job se o app novo não responder — ver comentários no próprio script.
         run: ssh deploy "cd '${DEPLOY_PATH}' && sh scripts/deploy.sh"
