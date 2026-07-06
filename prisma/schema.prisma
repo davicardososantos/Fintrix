@@ -66,19 +66,27 @@ enum InvestmentType {
   other
 }
 
+enum BillRecurrence {
+  monthly // conta fixa que se repete todo mês
+  one_time // conta avulsa (paga uma vez)
+}
+
 model Household {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
 
-  users        User[]
-  accounts     FinancialAccount[]
-  categories   Category[]
-  rules        CategoryRule[]
-  importBatches ImportBatch[]
-  transactions Transaction[]
-  pointsPrograms PointsProgram[]
-  investments  Investment[]
+  users             User[]
+  accounts          FinancialAccount[]
+  categories        Category[]
+  rules             CategoryRule[]
+  importBatches     ImportBatch[]
+  transactions      Transaction[]
+  pointsPrograms    PointsProgram[]
+  investments       Investment[]
+  bills             Bill[]
+  billPayments      BillPayment[]
+  pushSubscriptions PushSubscription[]
 }
 
 model User {
@@ -90,30 +98,32 @@ model User {
   role         UserRole @default(member)
   createdAt    DateTime @default(now())
 
-  household        Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  ownedTransactions Transaction[]     @relation("TransactionOwner")
-  importBatches    ImportBatch[]
+  household          Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  ownedTransactions  Transaction[]      @relation("TransactionOwner")
+  importBatches      ImportBatch[]
   defaultForAccounts FinancialAccount[] @relation("AccountDefaultOwner")
-  pointsPrograms   PointsProgram[]
-  investments      Investment[]
+  pointsPrograms     PointsProgram[]
+  investments        Investment[]
+  bills              Bill[]
+  pushSubscriptions  PushSubscription[]
 
   @@index([householdId])
 }
 
 model FinancialAccount {
-  id             String      @id @default(cuid())
-  householdId    String
-  name           String
-  type           AccountType
-  institution    String?
-  last4          String?
-  defaultOwnerId String?
+  id               String      @id @default(cuid())
+  householdId      String
+  name             String
+  type             AccountType
+  institution      String?
+  last4            String?
+  defaultOwnerId   String?
   balanceCents     Int? // saldo atual informado manualmente (null = não informado)
   balanceUpdatedAt DateTime? // quando o saldo foi atualizado pela última vez
 
-  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  defaultOwner  User?         @relation("AccountDefaultOwner", fields: [defaultOwnerId], references: [id])
-  transactions  Transaction[]
+  household    Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  defaultOwner User?         @relation("AccountDefaultOwner", fields: [defaultOwnerId], references: [id])
+  transactions Transaction[]
 
   @@unique([householdId, name])
   @@index([householdId])
@@ -233,15 +243,15 @@ model PointsSnapshot {
 }
 
 model Investment {
-  id            String         @id @default(cuid())
-  householdId   String
-  name          String
-  type          InvestmentType @default(cdb)
-  institution   String?
+  id             String         @id @default(cuid())
+  householdId    String
+  name           String
+  type           InvestmentType @default(cdb)
+  institution    String?
   principalCents Int
-  appliedAt     DateTime
-  maturityAt    DateTime?
-  ownerId       String?
+  appliedAt      DateTime
+  maturityAt     DateTime?
+  ownerId        String?
 
   household Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
   owner     User?                @relation(fields: [ownerId], references: [id], onDelete: SetNull)
@@ -259,4 +269,59 @@ model InvestmentSnapshot {
   investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
 
   @@index([investmentId, date])
+}
+
+// Conta a pagar: lembrete de vencimento. Fixa mensal (recurrence=monthly, dueDay) ou avulsa
+// (recurrence=one_time, dueDate). Dinheiro em centavos; ownerId null = casal.
+model Bill {
+  id          String         @id @default(cuid())
+  householdId String
+  name        String
+  amountCents Int? // valor esperado (opcional — contas como energia variam)
+  recurrence  BillRecurrence @default(monthly)
+  dueDay      Int? // 1-31, para recorrentes mensais
+  dueDate     DateTime? // para avulsas (one_time)
+  ownerId     String? // null = casal
+  active      Boolean        @default(true)
+  notes       String?
+  createdAt   DateTime       @default(now())
+
+  household Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  owner     User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  payments  BillPayment[]
+
+  @@index([householdId])
+}
+
+// Uma linha = "esta conta foi paga neste mês/ocorrência". Ausência = não paga.
+model BillPayment {
+  id          String   @id @default(cuid())
+  billId      String
+  householdId String
+  periodKey   String // "YYYY-MM" (mensal) ou mês de vencimento (avulsa)
+  paidAt      DateTime @default(now())
+  amountCents Int? // valor efetivamente pago (opcional)
+
+  bill      Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([billId, periodKey])
+  @@index([householdId])
+}
+
+// Assinaturas de push por dispositivo (lembrete de vencimento). endpoint é VarChar(500) por
+// causa do limite de índice único em MySQL (TEXT precisaria de prefixo).
+model PushSubscription {
+  id          String   @id @default(cuid())
+  householdId String
+  userId      String
+  endpoint    String   @unique @db.VarChar(500)
+  p256dh      String   @db.Text
+  auth        String   @db.Text
+  createdAt   DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
 }

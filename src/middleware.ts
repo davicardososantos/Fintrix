@@ -13,7 +13,8 @@ export default auth((req) => {
   const isPublic =
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
-    pathname.startsWith("/api/auth");
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/cron"); // server-to-server, protegido por CRON_SECRET no handler
 
   if (!isAuth && !isPublic) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));

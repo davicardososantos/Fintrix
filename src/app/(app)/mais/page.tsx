@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddMemberForm } from "@/components/members/add-member-form";
-import { Tags, Users, Plane, TrendingUp, Wallet } from "lucide-react";
+import { Tags, Users, Plane, TrendingUp, Wallet, CalendarClock } from "lucide-react";
 
 export default async function MaisPage() {
   const session = await auth();
@@ -53,6 +53,7 @@ export default async function MaisPage() {
       )}
 
       <div className="flex flex-col gap-3">
+        <NavCard href="/contas-a-pagar" icon={<CalendarClock className="h-5 w-5 text-warning" />} title="Contas a pagar" desc="Lembretes de vencimento do mês" />
         <NavCard href="/contas" icon={<Wallet className="h-5 w-5 text-primary" />} title="Contas" desc="Saldo atual de cada conta e carteira" />
         <NavCard href="/pontos" icon={<Plane className="h-5 w-5 text-points" />} title="Pontos" desc="Smiles, Livelo, TudoAzul, LATAM" />
         <NavCard href="/investimentos" icon={<TrendingUp className="h-5 w-5 text-investment" />} title="Investimentos" desc="CDB e outros — acompanhe o rendimento" />

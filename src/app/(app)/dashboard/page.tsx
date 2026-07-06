@@ -10,6 +10,8 @@ import { NetWorthCard } from "@/components/net-worth-card";
 import { LogOut, Upload, ArrowUpRight, ArrowDownRight, TrendingDown, TrendingUp } from "lucide-react";
 import { getSummary, getByCategory, getByPerson, getLatestMonthWithData } from "@/lib/reports/reports";
 import { getAccounts, getInvestments, getPointsPrograms } from "@/lib/portfolio";
+import { getUnpaidBills } from "@/lib/bills";
+import { BillReminderCard } from "@/components/bills/bill-reminder-card";
 import { monthRange, addMonths, parseMonthParam, monthKeyToParam } from "@/lib/reports/date-range";
 
 export default async function DashboardPage({
@@ -38,11 +40,15 @@ export default async function DashboardPage({
     />
   );
 
+  const unpaidBills = await getUnpaidBills(householdId);
+  const billReminder = <BillReminderCard bills={unpaidBills} />;
+
   if (total === 0) {
     return (
       <div className="flex flex-col gap-5">
         <Header name={session!.user.name} householdName={household?.name} />
         {netWorth}
+        {billReminder}
         <Card>
           <CardHeader>
             <CardTitle>Comece por aqui</CardTitle>
@@ -79,6 +85,7 @@ export default async function DashboardPage({
     <div className="flex flex-col gap-5">
       <Header name={session!.user.name} householdName={household?.name} />
       {netWorth}
+      {billReminder}
       <MonthNav current={current} />
 
       <Card>
