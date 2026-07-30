@@ -18,6 +18,12 @@ export function monthKeyToParam({ year, month }: MonthKey): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
 
+/** Mês atual em UTC. */
+export function currentMonthKey(): MonthKey {
+  const n = new Date();
+  return { year: n.getUTCFullYear(), month: n.getUTCMonth() + 1 };
+}
+
 export function parseMonthParam(value: string | undefined): MonthKey | null {
   if (!value) return null;
   const m = value.match(/^(\d{4})-(\d{2})$/);

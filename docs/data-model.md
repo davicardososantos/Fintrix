@@ -158,9 +158,58 @@ Investimentos conservadores (CDB C6).
 | valueCents | Int | valor atual (atualização manual) |
 | date | DateTime | |
 
+### Bill + BillPayment + BillPeriodAmount
+Contas a pagar (lembretes de vencimento). `Bill` é um **template**: as ocorrências de cada mês
+são calculadas na leitura (`src/lib/bills.ts`), nada é pré-gerado.
+
+| Bill | Tipo | Notas |
+|---|---|---|
+| id / householdId | | |
+| name | String | |
+| amountCents | Int? | valor esperado (null = variável, ex.: energia) |
+| recurrence | Enum(`monthly`,`one_time`) | |
+| dueDay | Int? | 1-31, para as mensais (limitado aos dias do mês na leitura) |
+| dueDate | DateTime? | para as avulsas |
+| ownerId | String? | null = casal |
+| parentId | String? | conta cobrada **dentro da fatura** de outra — só 1 nível |
+| active | Boolean | |
+
+`parentId` é o agrupamento "dentro da fatura" (ex.: Seguro e Arquiteta dentro do Cartão): o filho
+herda o vencimento do pai, não tem `dueDay` próprio e é pago junto com ele. Na tela o pai exibe o
+**restante** (total informado − soma dos filhos), então somar as linhas dá o total da fatura.
+FK `ON DELETE SET NULL`: apagar a fatura promove os filhos a contas soltas, não os destrói.
+
+| BillPayment | Tipo | Notas |
+|---|---|---|
+| id / billId / householdId | | |
+| periodKey | String | "YYYY-MM" — **único** com billId |
+| paidAt | DateTime | |
+| amountCents | Int? | valor efetivamente pago |
+
+**A existência da linha é o "pago"**; ausência = não paga. Desmarcar apaga a linha. Num grupo, o
+pai guarda o total da fatura e cada filho o valor dele — qualquer agregado futuro de "quanto
+pagamos" precisa excluir `bill.parentId != null`, senão conta em dobro.
+
+| BillPeriodAmount | Tipo | Notas |
+|---|---|---|
+| id / billId / householdId | | |
+| periodKey | String | "YYYY-MM" — **único** com billId |
+| amountCents | Int | valor informado só para este mês |
+
+Sobrepõe `Bill.amountCents` naquele período. Usos: total da fatura do cartão (digitado **antes**
+de pagar, por isso não cabe em `BillPayment`) e contas que variam todo mês. Ausência = usa o valor
+cadastrado; "limpar o valor do mês" apaga a linha (nunca grava null).
+
+> O importador da fatura C6 também grava essas compras como `Transaction`, e nada liga `Bill` ↔
+> `Transaction`. O "Total do mês" de /contas-a-pagar é total de **lembrete** — nunca somar com os
+> gastos do dashboard.
+
 ## Índices importantes
 
 - `Transaction(householdId, dedupHash)` **único** — garante idempotência do import.
 - `Transaction(householdId, date)` — relatórios por período.
 - `Transaction(householdId, categoryId)` / `(householdId, ownerId)` — relatórios por categoria/pessoa.
 - `ImportBatch(householdId, fileHash)` — detectar reupload do mesmo arquivo.
+- `BillPayment(billId, periodKey)` **único** — marcar paga é idempotente por mês.
+- `BillPeriodAmount(billId, periodKey)` **único** — um valor informado por conta/mês.
+- `Bill(parentId)` — montar os grupos "dentro da fatura".

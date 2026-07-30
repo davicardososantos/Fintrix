@@ -86,6 +86,7 @@ model Household {
   investments       Investment[]
   bills             Bill[]
   billPayments      BillPayment[]
+  billPeriodAmounts BillPeriodAmount[]
   pushSubscriptions PushSubscription[]
 }
 
@@ -273,6 +274,8 @@ model InvestmentSnapshot {
 
 // Conta a pagar: lembrete de vencimento. Fixa mensal (recurrence=monthly, dueDay) ou avulsa
 // (recurrence=one_time, dueDate). Dinheiro em centavos; ownerId null = casal.
+// parentId agrupa contas "dentro da fatura" de outra (ex.: Seguro e Arquiteta dentro do Cartão):
+// o filho herda o vencimento do pai e é pago junto com ele. Só 1 nível de aninhamento.
 model Bill {
   id          String         @id @default(cuid())
   householdId String
@@ -282,18 +285,27 @@ model Bill {
   dueDay      Int? // 1-31, para recorrentes mensais
   dueDate     DateTime? // para avulsas (one_time)
   ownerId     String? // null = casal
+  parentId    String? // null = conta solta; senão está dentro da fatura desta conta
   active      Boolean        @default(true)
   notes       String?
   createdAt   DateTime       @default(now())
 
-  household Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  owner     User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  payments  BillPayment[]
+  household     Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  owner         User?              @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  payments      BillPayment[]
+  periodAmounts BillPeriodAmount[]
+  // SetNull (não Cascade): apagar a fatura não pode destruir as contas de dentro nem o
+  // histórico de pagamento delas — elas voltam a ser contas soltas.
+  parent        Bill?              @relation("BillGroup", fields: [parentId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  children      Bill[]             @relation("BillGroup")
 
   @@index([householdId])
+  @@index([parentId])
 }
 
 // Uma linha = "esta conta foi paga neste mês/ocorrência". Ausência = não paga.
+// Num grupo, o pai guarda o total da fatura e cada filho guarda o valor dele — qualquer
+// agregado futuro de "quanto pagamos" precisa excluir bill.parentId != null (senão conta em dobro).
 model BillPayment {
   id          String   @id @default(cuid())
   billId      String
@@ -301,6 +313,25 @@ model BillPayment {
   periodKey   String // "YYYY-MM" (mensal) ou mês de vencimento (avulsa)
   paidAt      DateTime @default(now())
   amountCents Int? // valor efetivamente pago (opcional)
+
+  bill      Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([billId, periodKey])
+  @@index([householdId])
+}
+
+// Valor informado para uma conta NUM mês, sobrepondo Bill.amountCents naquele período.
+// Usos: total da fatura do cartão (digitado ANTES de pagar, por isso não cabe em BillPayment)
+// e contas que variam todo mês (energia, água). Ausência = usar Bill.amountCents;
+// "limpar o valor do mês" = apagar a linha (nunca gravar null).
+model BillPeriodAmount {
+  id          String   @id @default(cuid())
+  billId      String
+  householdId String
+  periodKey   String // "YYYY-MM"
+  amountCents Int
+  updatedAt   DateTime @updatedAt
 
   bill      Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
   household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
