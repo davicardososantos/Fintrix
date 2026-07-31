@@ -5,6 +5,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { parseDateISO } from "@/lib/import/util";
+import { POINTS_NAME_MAX, POINTS_OTHER } from "@/lib/points";
 
 async function requireHousehold() {
   const session = await auth();
@@ -13,7 +14,11 @@ async function requireHousehold() {
 }
 
 const programSchema = z.object({
-  name: z.enum(["smiles", "livelo", "azul", "latam"]),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Informe o nome do programa")
+    .max(POINTS_NAME_MAX, "Nome muito longo"),
   ownerId: z.string().optional(),
 });
 
@@ -25,11 +30,15 @@ export async function addPointsProgramAction(
   formData: FormData,
 ): Promise<PointsState> {
   const householdId = await requireHousehold();
+  // O form manda um preset do dropdown ou "Outro..." + o nome digitado.
+  const preset = String(formData.get("preset") ?? "");
+  const name = preset === POINTS_OTHER ? String(formData.get("customName") ?? "") : preset;
+
   const parsed = programSchema.safeParse({
-    name: formData.get("name"),
+    name,
     ownerId: formData.get("ownerId") || undefined,
   });
-  if (!parsed.success) return { error: "Dados inválidos" };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Dados inválidos" };
 
   const ownerId = parsed.data.ownerId && parsed.data.ownerId !== "casal" ? parsed.data.ownerId : null;
   if (ownerId) {
@@ -37,9 +46,30 @@ export async function addPointsProgramAction(
     if (!ok) return { error: "Pessoa inválida" };
   }
 
+  const dup = await prisma.pointsProgram.findFirst({
+    where: { householdId, name: parsed.data.name, ownerId },
+  });
+  if (dup) return { error: "Esse programa já existe" };
+
   await prisma.pointsProgram.create({
     data: { householdId, name: parsed.data.name, ownerId },
   });
+  revalidatePath("/pontos");
+  return { ok: true };
+}
+
+/** Remove um programa e todos os seus saldos (snapshots caem por cascade). */
+export async function deletePointsProgramAction(
+  _prev: PointsState,
+  formData: FormData,
+): Promise<PointsState> {
+  const householdId = await requireHousehold();
+  const id = String(formData.get("programId") ?? "");
+
+  const program = await prisma.pointsProgram.findFirst({ where: { id, householdId } });
+  if (!program) return { error: "Programa inválido" };
+
+  await prisma.pointsProgram.delete({ where: { id: program.id } });
   revalidatePath("/pontos");
   return { ok: true };
 }

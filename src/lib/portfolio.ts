@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
-import type { PointsProgramName, AccountType } from "@prisma/client";
+import { pointsColor } from "@/lib/points";
+import type { AccountType } from "@prisma/client";
 
 export const ACCOUNT_LABEL: Record<AccountType, string> = {
   checking: "Conta corrente",
@@ -42,23 +43,9 @@ export async function getAccounts(
   return { accounts, totalBalanceCents };
 }
 
-export const POINTS_LABEL: Record<PointsProgramName, string> = {
-  smiles: "Smiles",
-  livelo: "Livelo",
-  azul: "TudoAzul",
-  latam: "LATAM Pass",
-};
-
-export const POINTS_COLOR: Record<PointsProgramName, string> = {
-  smiles: "warning",
-  livelo: "points",
-  azul: "investment",
-  latam: "accent",
-};
-
 export type PointsProgramView = {
   id: string;
-  name: PointsProgramName;
+  name: string;
   label: string;
   color: string;
   ownerName: string | null;
@@ -83,8 +70,8 @@ export async function getPointsPrograms(householdId: string): Promise<PointsProg
     return {
       id: p.id,
       name: p.name,
-      label: POINTS_LABEL[p.name],
-      color: POINTS_COLOR[p.name],
+      label: p.name,
+      color: pointsColor(p.name),
       ownerName: p.owner?.name.split(" ")[0] ?? null,
       balance: latest?.balance ?? 0,
       variation: latest && prev ? latest.balance - prev.balance : 0,

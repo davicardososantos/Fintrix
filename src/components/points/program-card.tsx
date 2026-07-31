@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { tokenBg } from "@/components/category-badge";
-import { addPointsSnapshotAction, type PointsState } from "@/lib/actions/points-actions";
+import {
+  addPointsSnapshotAction,
+  deletePointsProgramAction,
+  type PointsState,
+} from "@/lib/actions/points-actions";
 import type { PointsProgramView } from "@/lib/portfolio";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +21,10 @@ const today = new Date().toISOString().slice(0, 10);
 export function ProgramCard({ program }: { program: PointsProgramView }) {
   const [state, action, pending] = useActionState<PointsState, FormData>(
     addPointsSnapshotAction,
+    undefined,
+  );
+  const [delState, delAction, delPending] = useActionState<PointsState, FormData>(
+    deletePointsProgramAction,
     undefined,
   );
   const ref = useRef<HTMLFormElement>(null);
@@ -86,6 +94,25 @@ export function ProgramCard({ program }: { program: PointsProgramView }) {
               ))}
             </ul>
           )}
+
+          <form action={delAction} className="mt-3 border-t border-border pt-2">
+            <input type="hidden" name="programId" value={program.id} />
+            {delState?.error && <p className="text-sm text-destructive">{delState.error}</p>}
+            <Button
+              type="submit"
+              size="sm"
+              variant="ghost"
+              disabled={delPending}
+              className="h-auto p-0 text-xs text-destructive hover:bg-transparent hover:text-destructive"
+              onClick={(e) => {
+                if (!confirm(`Remover ${program.label} e todo o histórico de saldos?`)) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              {delPending ? "Removendo..." : "Remover programa"}
+            </Button>
+          </form>
         </details>
       </CardContent>
     </Card>

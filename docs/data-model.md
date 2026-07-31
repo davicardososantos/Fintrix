@@ -129,7 +129,7 @@ Pontos de fidelidade, atualização manual.
 | PointsProgram | Tipo | Notas |
 |---|---|---|
 | id / householdId | | |
-| name | Enum(`smiles`,`livelo`,`azul`,`latam`) | |
+| name | String | texto livre; a UI sugere os programas conhecidos |
 | ownerId | String? | de quem é o programa (ou casal) |
 
 | PointsSnapshot | Tipo | Notas |

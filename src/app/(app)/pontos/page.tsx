@@ -19,7 +19,7 @@ export default async function PontosPage() {
       <div>
         <h1 className="text-xl font-bold">Pontos</h1>
         <p className="text-sm text-muted-foreground">
-          Smiles, Livelo, TudoAzul e LATAM Pass — atualize os saldos manualmente.
+          Smiles, Livelo, C6 e outros — atualize os saldos manualmente.
         </p>
       </div>
 

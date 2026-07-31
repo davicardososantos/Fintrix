@@ -54,13 +54,6 @@ enum RuleMatchType {
   equals
 }
 
-enum PointsProgramName {
-  smiles
-  livelo
-  azul
-  latam
-}
-
 enum InvestmentType {
   cdb
   other
@@ -219,9 +212,9 @@ model CategoryRule {
 }
 
 model PointsProgram {
-  id          String            @id @default(cuid())
+  id          String  @id @default(cuid())
   householdId String
-  name        PointsProgramName
+  name        String // texto livre; a UI sugere os programas conhecidos
   ownerId     String?
 
   household Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
