@@ -26,6 +26,8 @@ de uma transação.
   3. **Gemini:** para as demais, chamar a IA **em lote**, recebendo `{descrição}→categoria` dentre a
      lista de categorias do household → `categorySource=ai`.
   4. **Fallback:** se o Gemini falhar/estourar/indisponível → deixa `uncategorized` (nunca bloqueia).
+  - Nas etapas 2 e 3, a descrição genérica "DEBITO DE CARTAO" (compra no débito do extrato C6) é
+    trocada pelo estabelecimento (`rawDescription`) — senão tudo caía em "Outros" (15/09/2026).
 - **RF2** Categorização roda **sem bloquear** o import (assíncrona/em lote); erro de IA não quebra o
   fluxo.
 - **RF3** Usuário vê a **lista de transações** (mais recentes primeiro) com descrição, valor

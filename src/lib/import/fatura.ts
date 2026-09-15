@@ -3,6 +3,16 @@ import { parseToCents } from "@/lib/money";
 import { parseDateBR } from "./util";
 import type { ParseResult, ParsedTransaction, AccountKey } from "./types";
 
+// Uma fatura pode agregar vários cartões (titular + adicionais); a conta representa o cartão C6
+// como fonte. A pessoa por trás de cada compra vem do ownerHint (Nome no Cartão), na Fase 3.
+// Exportada: a fatura em PDF (fatura-pdf.ts) usa a MESMA chave, para o dedup casar CSV e PDF.
+export const C6_CARTAO: AccountKey = {
+  key: "c6_cartao",
+  name: "C6 Cartão",
+  type: "credit_card",
+  institution: "C6",
+};
+
 /**
  * Parser da Fatura de Cartão C6 (CSV, separador ";").
  * Compra = saída (valor negativo no amountCents). "Inclusao de Pagamento" vem com valor negativo
@@ -57,19 +67,10 @@ export function parseFatura(rawText: string): ParseResult {
     });
   }
 
-  // Uma fatura pode agregar vários cartões (titular + adicionais); a conta representa o cartão C6
-  // como fonte. A pessoa por trás de cada compra vem do ownerHint (Nome no Cartão), na Fase 3.
-  const account: AccountKey = {
-    key: "c6_cartao",
-    name: "C6 Cartão",
-    type: "credit_card",
-    institution: "C6",
-  };
-
   const sorted = dates.sort((a, b) => a.getTime() - b.getTime());
   return {
     source: "c6_fatura",
-    account,
+    account: C6_CARTAO,
     transactions,
     periodStart: sorted[0],
     periodEnd: sorted[sorted.length - 1],

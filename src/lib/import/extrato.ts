@@ -3,7 +3,8 @@ import { parseToCents } from "@/lib/money";
 import { parseDateBR } from "./util";
 import type { ParseResult, ParsedTransaction, AccountKey } from "./types";
 
-const ACCOUNT: AccountKey = {
+// Exportada: o extrato em PDF (extrato-pdf.ts) usa a MESMA chave, para o dedup casar CSV e PDF.
+export const C6_CONTA: AccountKey = {
   key: "c6_conta",
   name: "C6 Conta",
   type: "checking",
@@ -32,7 +33,7 @@ export function parseExtrato(rawText: string): ParseResult {
 
   const headerIdx = lines.findIndex((l) => /^Data Lan[çc]amento,/i.test(l));
   if (headerIdx === -1) {
-    return { source: "c6_extrato", account: ACCOUNT, transactions: [], errorRows: 0 };
+    return { source: "c6_extrato", account: C6_CONTA, transactions: [], errorRows: 0 };
   }
 
   const csv = lines.slice(headerIdx).join("\n");
@@ -69,5 +70,5 @@ export function parseExtrato(rawText: string): ParseResult {
     });
   }
 
-  return { source: "c6_extrato", account: ACCOUNT, transactions, periodStart, periodEnd, errorRows };
+  return { source: "c6_extrato", account: C6_CONTA, transactions, periodStart, periodEnd, errorRows };
 }

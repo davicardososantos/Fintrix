@@ -35,4 +35,7 @@ export type ParseResult = {
   periodStart?: Date;
   periodEnd?: Date;
   errorRows: number; // linhas inválidas puladas
+  // Saldo informado pelo próprio arquivo (ex.: "Saldo do dia" do extrato C6 em PDF). Quando vem,
+  // o import atualiza FinancialAccount.balanceCents se for mais recente que o saldo gravado.
+  balance?: { cents: number; date: Date };
 };

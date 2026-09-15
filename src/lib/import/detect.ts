@@ -8,9 +8,16 @@ export function detectSource(text: string, isPdf: boolean): ImportSource | null 
   const t = text.slice(0, 4000);
 
   if (isPdf) {
-    // Alelo é a única fonte PDF suportada por ora (Santander virá depois).
     if (/meualelo/i.test(t) || /rede\s+aliment/i.test(t)) {
       return "alelo";
+    }
+    // Extrato da conta C6 exportado do app ("Extrato exportado no dia … Agência: 1 • Conta: …").
+    if (/Extrato exportado no dia/i.test(t) && /Ag[êe]ncia:/i.test(t)) {
+      return "c6_extrato";
+    }
+    // Fatura do cartão C6 ("Sua fatura com vencimento em …", "Cartão C6 Carbon").
+    if (/Sua fatura com\s+vencimento/i.test(t) || /Cart[ãa]o C6 Carbon/i.test(t)) {
+      return "c6_fatura";
     }
     return null;
   }

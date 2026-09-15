@@ -5,6 +5,12 @@ import { matchRule } from "./rules";
 import { matchOwner } from "./attribution";
 import { categorizeWithGemini } from "./gemini";
 
+// No extrato C6, compra no débito tem descrição genérica ("DEBITO DE CARTAO") e o estabelecimento
+// fica em rawDescription — é ele que diz a categoria.
+const DESCRICAO_GENERICA = /^D[ÉE]BITO DE CART[ÃA]O\s*$/i;
+const textoParaCategorizar = (t: { description: string; rawDescription: string | null }) =>
+  DESCRICAO_GENERICA.test(t.description) && t.rawDescription ? t.rawDescription : t.description;
+
 export type CategorizeResult = {
   processed: number;
   byC6: number;
@@ -36,6 +42,7 @@ export async function categorizeHousehold(householdId: string): Promise<Categori
     select: {
       id: true,
       description: true,
+      rawDescription: true,
       rawCategory: true,
       ownerId: true,
       ownerHint: true,
@@ -61,12 +68,13 @@ export async function categorizeHousehold(householdId: string): Promise<Categori
       byC6++;
     } else {
       // 2) regra por palavra-chave
-      const ruleCat = matchRule(t.description, rules);
+      const texto = textoParaCategorizar(t);
+      const ruleCat = matchRule(texto, rules);
       if (ruleCat) {
         updates.set(t.id, { categoryId: ruleCat, categorySource: "rule" });
         byRule++;
       } else {
-        forAi.push({ id: t.id, description: t.description });
+        forAi.push({ id: t.id, description: texto });
       }
     }
 

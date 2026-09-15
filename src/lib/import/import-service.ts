@@ -37,6 +37,14 @@ export async function importBuffer(
 
   const account = await getOrCreateAccount(householdId, result.account);
 
+  // Saldo informado pelo arquivo (extrato C6 em PDF): só sobrescreve se for mais recente.
+  if (result.balance && (!account.balanceUpdatedAt || result.balance.date > account.balanceUpdatedAt)) {
+    await prisma.financialAccount.update({
+      where: { id: account.id },
+      data: { balanceCents: result.balance.cents, balanceUpdatedAt: result.balance.date },
+    });
+  }
+
   const existingBatch = await prisma.importBatch.findFirst({
     where: { householdId, fileHash },
     select: { id: true },

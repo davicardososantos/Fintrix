@@ -21,3 +21,19 @@
       preservadas (extrato: 30/30 importadas, sem colapso).
 - [x] T11 — Verificação end-to-end com os 3 arquivos de `Exemplos/Junho/`: 115 transações; reimport
       → 0 duplicadas.
+
+## Adendo 15/09/2026 — PDFs do C6
+
+- [x] T12 — `lib/import/pdf-text.ts`: extração de texto com colunas (TAB entre itens distantes na
+      mesma linha); o Alelo segue no modo antigo.
+- [x] T13 — `lib/import/extrato-pdf.ts`: extrato C6 em PDF (seções por mês, descrição em várias
+      linhas, "Débito de Cartão" como no CSV, período e saldo do dia).
+- [x] T14 — `lib/import/fatura-pdf.ts`: fatura C6 em PDF (seção por cartão, ano pelo fechamento,
+      parcela/estorno/pagamento, US$) + subtotais para conferência.
+- [x] T15 — `detect.ts`/`parse.ts`: assinaturas dos PDFs do C6 e erro claro para PDF com senha.
+- [x] T16 — `import-service.ts`: saldo do arquivo atualiza `FinancialAccount` se for mais recente.
+- [x] T17 — `dedup.ts`: parcela na chave + migração `import-cli.ts rehash-parcelas`.
+- [x] T18 — `scripts/check-pdf-import.ts` (conferência PDF × subtotais × CSV) e
+      `scripts/import-cli.ts importar` (carga em lote no servidor).
+- [x] T19 — Categorização (spec 002): "DEBITO DE CARTAO" categoriza pelo estabelecimento
+      (`rawDescription`).
