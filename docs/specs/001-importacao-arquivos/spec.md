@@ -71,6 +71,10 @@ ignoradas / erros).
 - Valores pt-BR (**vírgula decimal**, `R$ 421,50`). Também há Saldo e "último benefício" no topo.
 - **Mapeamento:** `date` = data da linha (`YYYY-MM-DD`); `description` = merchant; `amountCents` =
   − valor (gasto) ou + valor (benefício/crédito); `account` = Alelo.
+- **Adendo 15/09/2026:** o MeuAlelo passou a mostrar a data como `DD/MM/YYYY` (e permite "Últimos 4
+  meses"). O parser aceita os dois formatos, e as chaves de dedup não mudam. O `Saldo` do topo, datado
+  pelo rodapé da impressão ("15/09/2026, 19:37"), vira `balance` e atualiza o saldo da conta Alelo
+  se for mais recente.
 
 ## Requisitos funcionais
 

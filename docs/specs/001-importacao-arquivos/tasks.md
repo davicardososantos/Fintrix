@@ -37,3 +37,6 @@
       `scripts/import-cli.ts importar` (carga em lote no servidor).
 - [x] T19 — Categorização (spec 002): "DEBITO DE CARTAO" categoriza pelo estabelecimento
       (`rawDescription`).
+- [x] T20 — `alelo.ts`: data `DD/MM/YYYY` (formato novo do MeuAlelo) além de `YYYY-MM-DD`, e saldo
+      do topo como `balance`. Conferido: extrato de 4 meses com 15 lançamentos e 0 erros, junho com as
+      mesmas 6 chaves do arquivo antigo, saldo R$ 514,63 = benefícios − gastos do período.
