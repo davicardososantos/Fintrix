@@ -54,7 +54,18 @@ const config: Config = {
         warning: "hsl(var(--warning))",
         investment: "hsl(var(--investment))",
         points: "hsl(var(--points))",
+        hero: {
+          DEFAULT: "hsl(var(--hero))",
+          foreground: "hsl(var(--hero-foreground))",
+          muted: "hsl(var(--hero-muted))",
+          accent: "hsl(var(--hero-accent))",
+        },
+        overlay: "hsl(var(--overlay))",
       },
+      maxWidth: { page: "var(--page-max)", auth: "var(--auth-max)", dialog: "var(--dialog-max)" },
+      spacing: { sidebar: "var(--sidebar-width)" },
+      maxHeight: { dialog: "var(--dialog-max-height)" },
+      boxShadow: { card: "var(--card-shadow)", floating: "var(--floating-shadow)" },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 4px)",

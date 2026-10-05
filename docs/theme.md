@@ -17,29 +17,33 @@
 Cores "cruas" — **não usar direto em componente**; existem para derivar os tokens semânticos.
 
 ### Primária — Teal (`brand`)
-| Escala | Hex |
-|---|---|
-| 50  | `#ECFDF5` |
-| 100 | `#D1FAE5` |
-| 200 | `#A7F3D0` |
-| 300 | `#6EE7B7` |
-| 400 | `#34D399` |
-| 500 | `#0E9F6E` ← **primária** |
-| 600 | `#0B8560` |
-| 700 | `#096A4E` |
-| 800 | `#07533E` |
-| 900 | `#05372A` |
+
+| Escala | Hex                      |
+| ------ | ------------------------ |
+| 50     | `#ECFDF5`                |
+| 100    | `#D1FAE5`                |
+| 200    | `#A7F3D0`                |
+| 300    | `#6EE7B7`                |
+| 400    | `#34D399`                |
+| 500    | `#0E9F6E` ← **primária** |
+| 600    | `#0B8560`                |
+| 700    | `#096A4E`                |
+| 800    | `#07533E`                |
+| 900    | `#05372A`                |
 
 ### Acento — Turquesa (`accent`)
+
 `#14B8A6` (400: `#2DD4BF`, 600: `#0D9488`)
 
 ### Neutros (surface/texto)
+
 Escala slate: `#F8FAFC` (50) · `#E2E8F0` (200) · `#94A3B8` (400) · `#475569` (600) · `#1E293B`
 (800) · `#0F172A` (900).
 
 ### Cores funcionais
-| Uso | Hex |
-|---|---|
+
+| Uso                        | Hex       |
+| -------------------------- | --------- |
 | Positivo (entrada/crédito) | `#16A34A` |
 | Negativo (saída/gasto)     | `#EF4444` |
 | Warning                    | `#F59E0B` |
@@ -52,31 +56,31 @@ Escala slate: `#F8FAFC` (50) · `#E2E8F0` (200) · `#94A3B8` (400) · `#475569` 
 
 Cada token tem valor em **light** e **dark**. Nomes compatíveis com shadcn/ui + extensões de domínio.
 
-| Token | Light | Dark | Uso |
-|---|---|---|---|
-| `background`            | `#F8FAFC` | `#0B1220` | fundo da página |
-| `foreground`           | `#0F172A` | `#E2E8F0` | texto principal |
-| `card`                 | `#FFFFFF` | `#0F172A` | superfície de card |
-| `card-foreground`      | `#0F172A` | `#E2E8F0` | texto no card |
-| `popover`              | `#FFFFFF` | `#0F172A` | menus/sheets |
-| `primary`             | `#0E9F6E` | `#34D399` | ação principal, marca |
-| `primary-foreground`   | `#FFFFFF` | `#05372A` | texto sobre primary |
-| `secondary`            | `#E2E8F0` | `#1E293B` | ação secundária |
-| `secondary-foreground` | `#0F172A` | `#E2E8F0` | texto sobre secondary |
-| `muted`                | `#F1F5F9` | `#1E293B` | fundo sutil |
-| `muted-foreground`     | `#64748B` | `#94A3B8` | texto secundário/legenda |
-| `accent`               | `#14B8A6` | `#2DD4BF` | destaque, links |
-| `accent-foreground`    | `#052E2B` | `#052E2B` | texto sobre accent |
-| `border`               | `#E2E8F0` | `#1E293B` | bordas/divisores |
-| `input`                | `#E2E8F0` | `#334155` | borda de campos |
-| `ring`                 | `#0E9F6E` | `#34D399` | foco (acessibilidade) |
-| `destructive`          | `#EF4444` | `#F87171` | ações destrutivas |
-| `destructive-foreground`| `#FFFFFF`| `#450A0A` | texto sobre destructive |
-| **`positive`**         | `#16A34A` | `#4ADE80` | **entrada/crédito** (domínio) |
-| **`negative`**         | `#EF4444` | `#F87171` | **saída/gasto** (domínio) |
-| **`warning`**          | `#F59E0B` | `#FBBF24` | alerta/atenção |
-| **`investment`**       | `#0EA5E9` | `#38BDF8` | módulo investimentos |
-| **`points`**           | `#8B5CF6` | `#A78BFA` | módulo pontos |
+| Token                    | Light     | Dark      | Uso                           |
+| ------------------------ | --------- | --------- | ----------------------------- |
+| `background`             | `#F8FAFC` | `#0B1220` | fundo da página               |
+| `foreground`             | `#0F172A` | `#E2E8F0` | texto principal               |
+| `card`                   | `#FFFFFF` | `#0F172A` | superfície de card            |
+| `card-foreground`        | `#0F172A` | `#E2E8F0` | texto no card                 |
+| `popover`                | `#FFFFFF` | `#0F172A` | menus/sheets                  |
+| `primary`                | `#0E9F6E` | `#34D399` | ação principal, marca         |
+| `primary-foreground`     | `#FFFFFF` | `#05372A` | texto sobre primary           |
+| `secondary`              | `#E2E8F0` | `#1E293B` | ação secundária               |
+| `secondary-foreground`   | `#0F172A` | `#E2E8F0` | texto sobre secondary         |
+| `muted`                  | `#F1F5F9` | `#1E293B` | fundo sutil                   |
+| `muted-foreground`       | `#64748B` | `#94A3B8` | texto secundário/legenda      |
+| `accent`                 | `#14B8A6` | `#2DD4BF` | destaque, links               |
+| `accent-foreground`      | `#052E2B` | `#052E2B` | texto sobre accent            |
+| `border`                 | `#E2E8F0` | `#1E293B` | bordas/divisores              |
+| `input`                  | `#E2E8F0` | `#334155` | borda de campos               |
+| `ring`                   | `#0E9F6E` | `#34D399` | foco (acessibilidade)         |
+| `destructive`            | `#EF4444` | `#F87171` | ações destrutivas             |
+| `destructive-foreground` | `#FFFFFF` | `#450A0A` | texto sobre destructive       |
+| **`positive`**           | `#16A34A` | `#4ADE80` | **entrada/crédito** (domínio) |
+| **`negative`**           | `#EF4444` | `#F87171` | **saída/gasto** (domínio)     |
+| **`warning`**            | `#F59E0B` | `#FBBF24` | alerta/atenção                |
+| **`investment`**         | `#0EA5E9` | `#38BDF8` | módulo investimentos          |
+| **`points`**             | `#8B5CF6` | `#A78BFA` | módulo pontos                 |
 
 > Tokens de domínio (`positive`, `negative`, `investment`, `points`) são **exclusivos do Fintrix** e
 > essenciais: uma entrada é sempre verde-positivo, um gasto sempre vermelho-negativo, em todo o app.
@@ -88,15 +92,15 @@ Cada token tem valor em **light** e **dark**. Nomes compatíveis com shadcn/ui +
 - **Família:** `Inter` (fallback `system-ui, sans-serif`). Tabular numbers ligado para valores (`font-variant-numeric: tabular-nums`) — dinheiro alinha bonito.
 - **Escala** (mobile-first):
 
-| Token | Tamanho / line-height | Uso |
-|---|---|---|
-| `display` | 32 / 40, weight 700 | saldo grande no dashboard |
-| `h1` | 24 / 32, 700 | título de tela |
-| `h2` | 20 / 28, 600 | seção |
-| `h3` | 18 / 26, 600 | subseção/card title |
-| `body` | 16 / 24, 400 | texto padrão (mín. 16 evita zoom no iOS) |
-| `sm` | 14 / 20, 400 | apoio |
-| `caption` | 12 / 16, 500 | legendas, chips |
+| Token     | Tamanho / line-height | Uso                                      |
+| --------- | --------------------- | ---------------------------------------- |
+| `display` | 32 / 40, weight 700   | saldo grande no dashboard                |
+| `h1`      | 24 / 32, 700          | título de tela                           |
+| `h2`      | 20 / 28, 600          | seção                                    |
+| `h3`      | 18 / 26, 600          | subseção/card title                      |
+| `body`    | 16 / 24, 400          | texto padrão (mín. 16 evita zoom no iOS) |
+| `sm`      | 14 / 20, 400          | apoio                                    |
+| `caption` | 12 / 16, 500          | legendas, chips                          |
 
 ---
 
@@ -130,23 +134,23 @@ Em `src/styles/globals.css` (valores HSL/hex por token, light e dark):
 
 ```css
 :root {
-  --background: 210 40% 98%;      /* #F8FAFC */
-  --foreground: 222 47% 11%;      /* #0F172A */
+  --background: 210 40% 98%; /* #F8FAFC */
+  --foreground: 222 47% 11%; /* #0F172A */
   --card: 0 0% 100%;
-  --primary: 158 84% 34%;         /* #0E9F6E */
+  --primary: 158 84% 34%; /* #0E9F6E */
   --primary-foreground: 0 0% 100%;
-  --positive: 142 71% 45%;        /* #16A34A */
-  --negative: 0 84% 60%;          /* #EF4444 */
-  --investment: 199 89% 48%;      /* #0EA5E9 */
-  --points: 258 90% 66%;          /* #8B5CF6 */
+  --positive: 142 71% 45%; /* #16A34A */
+  --negative: 0 84% 60%; /* #EF4444 */
+  --investment: 199 89% 48%; /* #0EA5E9 */
+  --points: 258 90% 66%; /* #8B5CF6 */
   --ring: 158 84% 34%;
   --radius: 16px;
   /* ...demais tokens... */
 }
 .dark {
-  --background: 222 47% 8%;       /* #0B1220 */
+  --background: 222 47% 8%; /* #0B1220 */
   --foreground: 213 31% 91%;
-  --primary: 158 64% 52%;         /* #34D399 */
+  --primary: 158 64% 52%; /* #34D399 */
   /* ...overrides dark de cada token... */
 }
 ```
@@ -190,7 +194,38 @@ Uso no componente (sempre token, nunca hex):
 - Estado de foco visível via `ring` em todo elemento interativo.
 - Não comunicar informação só por cor (entrada/saída também têm sinal `+`/`−` e/ou ícone).
 
-## 9. Como adicionar/alterar um token (processo)
+## 9. Redesign 007 — superfícies e movimento
+
+Direção: superfícies graphite no escuro e off-white no claro, verde profundo nas ações,
+tipografia com mais espaço e hero teal. Cards continuam semanticamente iguais nos dois temas.
+Dark é o padrão inicial; o usuário pode selecionar e persistir Light.
+
+| Token            | Light (HSL) | Dark (HSL)  | Uso                |
+| ---------------- | ----------- | ----------- | ------------------ |
+| background       | 160 20% 97% | 180 14% 7%  | canvas             |
+| foreground       | 170 25% 12% | 150 14% 94% | texto principal    |
+| card             | 0 0% 100%   | 180 12% 11% | superfície         |
+| muted            | 160 16% 94% | 180 10% 15% | superfície interna |
+| muted-foreground | 170 10% 39% | 170 9% 65%  | texto secundário   |
+| primary          | 162 83% 25% | 158 64% 52% | ação/links         |
+| positive         | 150 70% 27% | 150 64% 62% | receitas           |
+| negative         | 0 72% 43%   | 0 86% 74%   | despesas           |
+| warning          | 32 95% 30%  | 43 96% 64%  | avisos             |
+| investment       | 200 88% 32% | 199 95% 68% | investimentos      |
+| points           | 258 65% 45% | 255 92% 80% | pontos             |
+| hero             | 170 55% 16% | 170 55% 16% | cartão principal   |
+| hero-foreground  | 150 30% 96% | 150 30% 96% | texto do hero      |
+| hero-muted       | 160 26% 76% | 160 26% 76% | legenda do hero    |
+| hero-accent      | 158 70% 72% | 158 70% 72% | detalhes do hero   |
+| overlay          | 180 14% 4%  | 180 14% 4%  | backdrop de dialog |
+
+Tokens complementares de dimensões: page-max=1200px; sidebar-width=248px;
+auth-max=420px; dialog-max=560px; dialog-max-height=85dvh; radius=20px;
+card-shadow e floating-shadow derivados de foreground/overlay; entrada 320ms, interação 200ms.
+Usar a escala de spacing existente. Ilustrações geométricas são decorativas, não representam dados.
+As definições desta seção substituem os valores anteriores onde houver diferença.
+
+## 10. Como adicionar/alterar um token (processo)
 
 1. Adiciona/edita o token aqui (light + dark) com justificativa.
 2. Reflete em `globals.css` (CSS var) e `tailwind.config`.

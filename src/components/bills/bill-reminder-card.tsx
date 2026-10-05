@@ -16,39 +16,51 @@ export function BillReminderCard({ bills }: { bills: BillView[] }) {
   const overdue = bills.filter((b) => b.status === "overdue").length;
 
   return (
-    <Card>
+    <Card className="border-warning/20">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
-            <CalendarClock className="h-4 w-4 text-warning" /> Contas a pagar
+            <CalendarClock className="h-5 w-5 text-warning" /> Próximos pagamentos
           </CardTitle>
           <Link
             href="/contas-a-pagar"
-            className="flex items-center text-xs font-medium text-primary"
+            className="flex min-h-11 items-center text-xs font-semibold text-primary"
           >
             Ver todas <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </div>
         <p className="text-xs text-muted-foreground">
-          {bills.length} em aberto{overdue > 0 ? ` · ${overdue} vencida${overdue > 1 ? "s" : ""}` : ""}
+          {bills.length} em aberto
+          {overdue > 0 ? ` · ${overdue} vencida${overdue > 1 ? "s" : ""}` : ""}
         </p>
       </CardHeader>
       <CardContent className="pt-0">
         <ul className="divide-y divide-border">
-          {bills.map((b) => (
+          {bills.slice(0, 3).map((b) => (
             <ReminderRow key={b.id} bill={b} />
           ))}
         </ul>
+        {bills.length > 3 && (
+          <Link
+            href="/contas-a-pagar"
+            className="mt-3 flex min-h-11 items-center justify-center rounded-md bg-muted text-xs font-medium text-muted-foreground"
+          >
+            Ver mais {bills.length - 3} conta{bills.length - 3 > 1 ? "s" : ""} em aberto
+          </Link>
+        )}
       </CardContent>
     </Card>
   );
 }
 
 function ReminderRow({ bill }: { bill: BillView }) {
-  const [, action, pending] = useActionState<BillState, FormData>(markBillPaidAction, undefined);
+  const [state, action, pending] = useActionState<BillState, FormData>(
+    markBillPaidAction,
+    undefined,
+  );
 
   return (
-    <li className="flex items-center justify-between gap-3 py-3">
+    <li className="flex flex-wrap items-center justify-between gap-3 py-3">
       <div className="min-w-0">
         <p className="truncate text-sm font-medium">{bill.name}</p>
         <p className={`text-xs ${statusText(bill.status)}`}>
@@ -64,11 +76,22 @@ function ReminderRow({ bill }: { bill: BillView }) {
         <form action={action}>
           <input type="hidden" name="billId" value={bill.id} />
           <input type="hidden" name="periodKey" value={bill.periodKey} />
-          <Button type="submit" size="sm" variant="ghost" disabled={pending} aria-label="Marcar paga">
-            <Check className="h-4 w-4 text-positive" /> {pending ? "..." : "Paga"}
+          <Button
+            type="submit"
+            size="sm"
+            variant="ghost"
+            disabled={pending}
+            aria-label={`Marcar ${bill.name} como paga`}
+          >
+            <Check className="h-4 w-4 text-positive" /> {pending ? "Salvando…" : "Paguei"}
           </Button>
         </form>
       </div>
+      {state?.error && (
+        <p role="alert" className="w-full text-xs text-destructive">
+          {state.error}
+        </p>
+      )}
     </li>
   );
 }

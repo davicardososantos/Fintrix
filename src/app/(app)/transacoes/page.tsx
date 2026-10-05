@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { PageHeader } from "@/components/page-header";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { Card } from "@/components/ui/card";
@@ -27,8 +28,8 @@ export default async function TransacoesPage({
   // Mês selecionado (‹ mês ›). Default: mês mais recente com dados, ou o mês atual.
   const now = new Date();
   const latest = await getLatestMonthWithData(householdId);
-  const current: MonthKey =
-    parseMonthParam(sp.m) ?? latest ?? { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
+  const current: MonthKey = parseMonthParam(sp.m) ??
+    latest ?? { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
 
   const where: Prisma.TransactionWhereInput = { householdId, date: monthRange(current) };
   if (sp.q) where.description = { contains: sp.q };
@@ -67,11 +68,12 @@ export default async function TransacoesPage({
   const catOptions = categories.map((c) => ({ id: c.id, name: c.name, color: c.color }));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Transações</h1>
-        <RecategorizeButton />
-      </div>
+    <div className="page-stack">
+      <PageHeader
+        title="Transações"
+        description="Cada movimento, organizado. Toque em um lançamento para editar."
+        action={<RecategorizeButton />}
+      />
 
       <MonthNav current={current} />
 
@@ -83,7 +85,7 @@ export default async function TransacoesPage({
         }}
       />
 
-      <p className="text-xs text-muted-foreground">{dtos.length} transações no mês</p>
+      <p className="eyebrow">{dtos.length} transações exibidas no período</p>
 
       {dtos.length === 0 ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">

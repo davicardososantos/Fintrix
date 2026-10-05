@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,8 +27,11 @@ export default async function CategoriasPage() {
   const countById = new Map(counts.map((c) => [c.categoryId, c._count]));
 
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-bold">Categorias</h1>
+    <div className="page-stack">
+      <PageHeader
+        title="Categorias"
+        description="Organize os lançamentos do jeito que faz sentido para vocês."
+      />
 
       <Card>
         <CardContent className="pt-6">

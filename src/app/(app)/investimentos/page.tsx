@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,8 +20,11 @@ export default async function InvestimentosPage() {
   const totalYield = totalInvestedCents - totalPrincipal;
 
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-bold">Investimentos</h1>
+    <div className="page-stack">
+      <PageHeader
+        title="Investimentos"
+        description="Acompanhe o que você está construindo para o futuro."
+      />
 
       {investments.length > 0 && (
         <Card>
@@ -28,10 +32,16 @@ export default async function InvestimentosPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total investido
             </CardTitle>
-            <Money amountCents={totalInvestedCents} colored={false} className="text-3xl font-bold" />
+            <Money
+              amountCents={totalInvestedCents}
+              colored={false}
+              className="text-3xl font-bold"
+            />
           </CardHeader>
           <CardContent>
-            <p className={`text-sm tabular-nums ${totalYield >= 0 ? "text-positive" : "text-negative"}`}>
+            <p
+              className={`text-sm tabular-nums ${totalYield >= 0 ? "text-positive" : "text-negative"}`}
+            >
               {totalYield >= 0 ? "+" : ""}
               <Money amountCents={totalYield} colored={false} /> de rendimento
             </p>
@@ -44,7 +54,7 @@ export default async function InvestimentosPage() {
           Nenhum investimento ainda. Cadastre o primeiro abaixo (ex.: seu CDB C6).
         </Card>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {investments.map((inv) => (
             <InvestmentCard key={inv.id} inv={inv} />
           ))}

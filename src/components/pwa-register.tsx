@@ -17,7 +17,8 @@ export function PwaRegister() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
+    // Bundles de desenvolvimento têm URLs estáveis; cacheá-los quebra o hot reload.
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
     const onPrompt = (e: Event) => {
@@ -31,7 +32,7 @@ export function PwaRegister() {
   if (!deferred || dismissed) return null;
 
   return (
-    <div className="safe-bottom fixed inset-x-0 bottom-20 z-40 mx-auto flex max-w-[440px] items-center gap-3 rounded-lg border border-border bg-card p-3 shadow-lg">
+    <div className="safe-bottom fixed inset-x-4 bottom-24 z-40 mx-auto flex max-w-auth items-center gap-3 rounded-lg border border-border bg-card p-3 shadow-floating lg:bottom-6 lg:left-auto lg:right-6">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/icons/icon-192.png" alt="" width={36} height={36} className="h-9 w-9 rounded-md" />
       <div className="min-w-0 flex-1">
@@ -44,11 +45,15 @@ export function PwaRegister() {
           await deferred.userChoice;
           setDeferred(null);
         }}
-        className="flex h-9 items-center gap-1 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground"
+        className="flex h-11 items-center gap-1 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground"
       >
         <Download className="h-4 w-4" /> Instalar
       </button>
-      <button aria-label="Dispensar" onClick={() => setDismissed(true)} className="text-muted-foreground">
+      <button
+        aria-label="Dispensar"
+        onClick={() => setDismissed(true)}
+        className="flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground"
+      >
         <X className="h-4 w-4" />
       </button>
     </div>

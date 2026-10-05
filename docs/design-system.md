@@ -78,3 +78,15 @@ cor). Biblioteca (ex.: Recharts) travada no spec de relatórios
 ## 7. Ícones
 
 Um único set (ex.: `lucide-react`), tamanho e stroke consistentes, herdando `currentColor` do token.
+
+## 8. Redesign 007
+
+- Desktop usa navegação lateral e canvas de até 1200px; celular mantém cinco destinos na barra inferior.
+- Resultado do mês e saldos informados têm rótulos distintos. Seletor de mês e atalhos precedem
+  os saldos secundários no celular. Últimas movimentações e pendências ganham acesso direto.
+- Módulos secundários ficam antes do formulário de membros em Mais.
+- Temas claro/escuro selecionáveis, com preferência local; campos e controles com foco visível.
+- Motion de 200–320ms em interações, entrada de página e barras; sem animação em reduced-motion.
+- Dialog nativo para editar transações: Escape, foco contido, retorno ao acionador e backdrop.
+- CSS compartilhado em @layer components centraliza superfícies, animações, skeletons e layouts.
+  Essas classes são a exceção documentada à preferência por utilitários por componente.

@@ -2,14 +2,16 @@
 // - navegações (páginas): network-first com fallback ao cache (offline básico).
 // - assets estáticos (_next/static, ícones): cache-first.
 // - nunca cacheia /api nem chamadas autenticadas de dados.
-const VERSION = "fintrix-v3";
+const VERSION = "fintrix-v4-design";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGES_CACHE = `${VERSION}-pages`;
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(["/manifest.webmanifest"]).catch(() => {})),
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => cache.addAll(["/manifest.webmanifest"]).catch(() => {})),
   );
 });
 

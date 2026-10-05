@@ -40,11 +40,11 @@ export function AccountCard({ account }: { account: AccountView }) {
     account.balanceCents != null ? (account.balanceCents / 100).toFixed(2).replace(".", ",") : "";
 
   return (
-    <Card>
+    <Card className="interactive-card">
       <CardContent className="pt-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+            <span className="icon-tile">
               <Icon className="h-4 w-4 text-primary" />
             </span>
             <div>
@@ -57,7 +57,11 @@ export function AccountCard({ account }: { account: AccountView }) {
           </div>
           <div className="text-right">
             {account.balanceCents != null ? (
-              <Money amountCents={account.balanceCents} colored={false} className="text-lg font-bold" />
+              <Money
+                amountCents={account.balanceCents}
+                colored={false}
+                className="text-lg font-bold"
+              />
             ) : (
               <span className="text-sm text-muted-foreground">Sem saldo</span>
             )}
@@ -97,7 +101,7 @@ export function AccountCard({ account }: { account: AccountView }) {
         ) : (
           <button
             onClick={() => setOpen(true)}
-            className="mt-3 text-sm font-medium text-primary"
+            className="mt-3 flex min-h-11 items-center text-sm font-semibold text-primary"
           >
             {account.balanceCents != null ? "Atualizar saldo" : "Informar saldo"}
           </button>

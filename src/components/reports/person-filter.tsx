@@ -26,7 +26,7 @@ export function PersonFilter({ options }: { options: PersonFilterOption[] }) {
           key={o.value}
           onClick={() => set(o.value)}
           className={cn(
-            "h-9 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors",
+            "h-11 shrink-0 rounded-md border px-4 text-sm font-medium transition-colors",
             active === o.value
               ? "border-primary bg-primary text-primary-foreground"
               : "border-input bg-background text-foreground",

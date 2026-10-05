@@ -8,62 +8,78 @@
  */
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 160 20% 97%;
+    --foreground: 170 25% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 170 25% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 158 84% 34%;
+    --popover-foreground: 170 25% 12%;
+    --primary: 162 83% 25%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --secondary: 160 16% 94%;
+    --secondary-foreground: 170 25% 12%;
+    --muted: 160 16% 94%;
+    --muted-foreground: 170 10% 39%;
     --accent: 173 80% 40%;
     --accent-foreground: 173 90% 12%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 158 84% 34%;
+    --border: 160 13% 87%;
+    --input: 160 13% 80%;
+    --ring: 162 83% 25%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* domínio financeiro */
-    --positive: 142 71% 45%;
-    --negative: 0 84% 60%;
-    --warning: 38 92% 50%;
-    --investment: 199 89% 48%;
-    --points: 258 90% 66%;
-
-    --radius: 16px;
+    --positive: 150 70% 27%;
+    --negative: 0 72% 43%;
+    --warning: 32 95% 30%;
+    --investment: 200 88% 32%;
+    --points: 258 65% 45%;
+    --hero: 170 55% 16%;
+    --hero-foreground: 150 30% 96%;
+    --hero-muted: 160 26% 76%;
+    --hero-accent: 158 70% 72%;
+    --overlay: 180 14% 4%;
+    --page-max: 1200px;
+    --sidebar-width: 248px;
+    --auth-max: 420px;
+    --dialog-max: 560px;
+    --dialog-max-height: 85dvh;
+    --radius: 20px;
+    --card-shadow: 0 4px 24px hsl(var(--foreground) / 0.035);
+    --floating-shadow: 0 12px 48px hsl(var(--overlay) / 0.16);
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --motion-slow: 320ms;
+    color-scheme: light;
   }
 
   .dark {
-    --background: 222 47% 8%;
-    --foreground: 213 31% 91%;
-    --card: 222 47% 11%;
-    --card-foreground: 213 31% 91%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 213 31% 91%;
+    --background: 180 14% 7%;
+    --foreground: 150 14% 94%;
+    --card: 180 12% 11%;
+    --card-foreground: 150 14% 94%;
+    --popover: 180 12% 11%;
+    --popover-foreground: 150 14% 94%;
     --primary: 158 64% 52%;
     --primary-foreground: 158 90% 12%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --secondary: 180 10% 15%;
+    --secondary-foreground: 150 14% 94%;
+    --muted: 180 10% 15%;
+    --muted-foreground: 170 9% 65%;
     --accent: 172 66% 50%;
     --accent-foreground: 172 90% 10%;
-    --border: 217 33% 17%;
-    --input: 215 25% 27%;
+    --border: 180 10% 21%;
+    --input: 180 10% 30%;
     --ring: 158 64% 52%;
     --destructive: 0 84% 63%;
     --destructive-foreground: 0 0% 100%;
 
-    --positive: 142 69% 58%;
-    --negative: 0 91% 71%;
-    --warning: 43 96% 56%;
-    --investment: 199 95% 60%;
-    --points: 255 92% 76%;
+    --positive: 150 64% 62%;
+    --negative: 0 86% 74%;
+    --warning: 43 96% 64%;
+    --investment: 199 95% 68%;
+    --points: 255 92% 80%;
+    color-scheme: dark;
   }
 }
 
@@ -76,6 +92,16 @@
     font-variant-numeric: tabular-nums;
     -webkit-tap-highlight-color: transparent;
   }
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+  }
+  select {
+    @apply max-w-full;
+  }
   /* Respeita safe-areas (notch/home-bar) — cara de app */
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
@@ -85,9 +111,75 @@
   }
 }
 
+@layer components {
+  .page-stack {
+    @apply flex min-w-0 flex-col gap-6;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
+  }
+  .hero-surface {
+    @apply relative overflow-hidden rounded-lg border border-hero-accent/20 bg-hero text-hero-foreground;
+    background-image: radial-gradient(
+      ellipse at top right,
+      hsl(var(--hero-accent) / 0.13),
+      transparent 65%
+    );
+  }
+  .icon-tile {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary;
+  }
+  .interactive-card {
+    @apply transition-all duration-200 hover:border-primary/40 hover:shadow-card active:scale-[0.99];
+  }
+  .page-enter {
+    animation: page-enter var(--motion-slow) ease-out both;
+  }
+  .bar-enter {
+    transform-origin: left;
+    animation: bar-enter var(--motion-slow) ease-out both;
+  }
+  .dialog-enter {
+    animation: page-enter var(--motion-base) ease-out both;
+  }
+  .skeleton {
+    @apply rounded-md bg-muted;
+    animation: skeleton-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes bar-enter {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (max-height: 800px) {
+  .nav-note {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

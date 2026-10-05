@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
@@ -29,7 +30,10 @@ export default async function RelatoriosPage({
   if (total === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-xl font-bold">Relatórios</h1>
+        <PageHeader
+          title="Relatórios"
+          description="Veja os padrões e entenda para onde o dinheiro está indo."
+        />
         <Card className="p-6 text-center text-sm text-muted-foreground">
           Importe transações para ver os relatórios.
         </Card>
@@ -42,7 +46,10 @@ export default async function RelatoriosPage({
   const range = monthRange(current);
 
   // Filtro por pessoa (afeta resumo e por-categoria)
-  const users = await prisma.user.findMany({ where: { householdId }, select: { id: true, name: true } });
+  const users = await prisma.user.findMany({
+    where: { householdId },
+    select: { id: true, name: true },
+  });
   let personExtra: Prisma.TransactionWhereInput | undefined;
   if (sp.person === "casal") personExtra = { ownerId: null };
   else if (sp.person) personExtra = { ownerId: sp.person };
@@ -68,8 +75,11 @@ export default async function RelatoriosPage({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="text-xl font-bold">Relatórios</h1>
+    <div className="page-stack">
+      <PageHeader
+        title="Relatórios"
+        description="Veja os padrões e entenda para onde o dinheiro está indo."
+      />
       <MonthNav current={current} />
       <PersonFilter options={personOptions} />
 
@@ -105,7 +115,12 @@ export default async function RelatoriosPage({
         </CardHeader>
         <CardContent>
           <BarList
-            items={byPerson.map((p) => ({ label: p.name, totalCents: p.totalCents, pct: p.pct, color: "primary" }))}
+            items={byPerson.map((p) => ({
+              label: p.name,
+              totalCents: p.totalCents,
+              pct: p.pct,
+              color: "primary",
+            }))}
           />
         </CardContent>
       </Card>
@@ -140,11 +155,16 @@ function SummaryTile({
   cents: number;
   tone?: "positive" | "negative";
 }) {
-  const color = tone === "positive" ? "text-positive" : tone === "negative" ? "text-negative" : "text-foreground";
+  const color =
+    tone === "positive"
+      ? "text-positive"
+      : tone === "negative"
+        ? "text-negative"
+        : "text-foreground";
   return (
-    <div className="rounded-lg border border-border bg-card p-3">
+    <div className="min-w-0 rounded-lg border border-border/70 bg-card p-3 sm:p-5">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-base font-bold tabular-nums ${color}`}>
+      <p className={`mt-2 break-words text-sm font-semibold tabular-nums sm:text-xl ${color}`}>
         <Money amountCents={cents} colored={false} />
       </p>
     </div>

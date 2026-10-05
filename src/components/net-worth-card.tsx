@@ -21,13 +21,21 @@ export function NetWorthCard({ accountsCents, investmentsCents, pointsTotal }: N
   const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
-    setHidden(localStorage.getItem(STORAGE_KEY) === "1");
+    try {
+      setHidden(localStorage.getItem(STORAGE_KEY) === "1");
+    } catch {
+      /* mantém os saldos ocultos */
+    }
   }, []);
 
   function toggle() {
     setHidden((h) => {
       const next = !h;
-      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      try {
+        localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      } catch {
+        /* preferência válida nesta sessão */
+      }
       return next;
     });
   }
@@ -37,21 +45,26 @@ export function NetWorthCard({ accountsCents, investmentsCents, pointsTotal }: N
   const points = (n: number) => (hidden ? MASK : nf.format(n));
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="flex-row items-start justify-between space-y-0">
         <div>
-          <CardTitle className="text-sm font-medium text-muted-foreground">Patrimônio</CardTitle>
-          <span className="mt-1 block text-3xl font-bold tabular-nums">{money(totalCents)}</span>
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Contas + investimentos
+          </CardTitle>
+          <span className="mt-3 block break-words text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl">
+            {money(totalCents)}
+          </span>
+          <p className="mt-2 text-xs text-muted-foreground">Com base nos saldos informados</p>
         </div>
         <button
           onClick={toggle}
           aria-label={hidden ? "Mostrar valores" : "Ocultar valores"}
-          className="rounded-full p-2 text-muted-foreground transition-colors active:bg-muted"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted"
         >
           {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
       </CardHeader>
-      <CardContent className="flex flex-col divide-y divide-border">
+      <CardContent className="flex flex-col divide-y divide-border/60">
         <Row
           href="/contas"
           icon={<Wallet className="h-4 w-4 text-primary" />}
@@ -67,7 +80,7 @@ export function NetWorthCard({ accountsCents, investmentsCents, pointsTotal }: N
         <Row
           href="/pontos"
           icon={<Plane className="h-4 w-4 text-points" />}
-          label="Pontos"
+          label="Pontos e milhas"
           value={`${points(pointsTotal)} pts`}
         />
       </CardContent>

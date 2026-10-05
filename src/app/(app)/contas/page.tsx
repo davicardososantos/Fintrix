@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
@@ -13,13 +14,11 @@ export default async function ContasPage() {
   const withBalance = accounts.filter((a) => a.balanceCents != null).length;
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-xl font-bold">Contas</h1>
-        <p className="text-sm text-muted-foreground">
-          Informe o saldo atual de cada conta ou carteira.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader
+        title="Contas e carteiras"
+        description="Acompanhe seus saldos e mantenha tudo atualizado."
+      />
 
       {withBalance > 0 && (
         <Card>
@@ -38,7 +37,7 @@ export default async function ContasPage() {
           automaticamente quando você importa extratos.
         </Card>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {accounts.map((a) => (
             <AccountCard key={a.id} account={a} />
           ))}

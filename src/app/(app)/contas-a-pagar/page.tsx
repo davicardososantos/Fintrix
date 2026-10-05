@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/page-header";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,9 +55,12 @@ export default async function ContasAPagarPage({
           : `${totals.openCount} em aberto de ${label}`;
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="page-stack">
       <div className="flex flex-col gap-3">
-        <h1 className="text-xl font-bold">Contas a pagar</h1>
+        <PageHeader
+          title="Contas a pagar"
+          description="Saiba o que vence, acompanhe os pagamentos e organize seu mês."
+        />
         <MonthNav current={current} />
         {!isCurrent && (
           <Link href="/contas-a-pagar" className="text-xs font-medium text-primary">

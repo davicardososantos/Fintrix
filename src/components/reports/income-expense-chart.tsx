@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useId } from "react";
 import { monthKeyToParam, type MonthKey } from "@/lib/reports/date-range";
 import { formatCompactCents } from "@/lib/money";
 
@@ -20,6 +21,7 @@ export function IncomeExpenseChart({
   points: SeriesPoint[];
   activeParam: string;
 }) {
+  const gradientId = useId();
   const W = 340;
   const H = 172;
   const padL = 12;
@@ -55,7 +57,35 @@ export function IncomeExpenseChart({
         </span>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Entradas e gastos por mês">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="mx-auto w-full max-w-xl"
+        role="img"
+        aria-label="Entradas e gastos por mês"
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="hsl(var(--positive))" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="hsl(var(--positive))" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0.25, 0.5, 0.75].map((fraction) => (
+          <line
+            key={fraction}
+            x1={padL}
+            x2={W - padR}
+            y1={padTop + plotH * fraction}
+            y2={padTop + plotH * fraction}
+            stroke="hsl(var(--border))"
+            strokeDasharray="3 5"
+          />
+        ))}
+        {n > 0 && (
+          <polygon
+            points={`${x(0)},${H - padBottom} ${incomePts} ${x(n - 1)},${H - padBottom}`}
+            fill={`url(#${gradientId})`}
+          />
+        )}
         {/* baseline */}
         <line
           x1={padL}
@@ -71,7 +101,7 @@ export function IncomeExpenseChart({
           points={expensePts}
           fill="none"
           stroke="hsl(var(--negative))"
-          strokeWidth={2}
+          strokeWidth={3}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
@@ -80,7 +110,7 @@ export function IncomeExpenseChart({
           points={incomePts}
           fill="none"
           stroke="hsl(var(--positive))"
-          strokeWidth={2}
+          strokeWidth={3}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
@@ -129,8 +159,8 @@ export function IncomeExpenseChart({
             <Link
               key={param}
               href={`/relatorios?m=${param}`}
-              className={`flex-1 text-center text-[10px] ${
-                active ? "font-semibold text-foreground" : "text-muted-foreground"
+              className={`flex min-h-11 flex-1 items-center justify-center rounded-md text-xs transition-colors hover:bg-muted ${
+                active ? "bg-primary/10 font-semibold text-primary" : "text-muted-foreground"
               }`}
             >
               {p.label}

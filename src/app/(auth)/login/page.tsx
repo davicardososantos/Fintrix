@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { LoginSubmit } from "@/components/login-submit";
+import { PasswordInput } from "@/components/password-input";
 
 async function loginAction(formData: FormData) {
   "use server";
@@ -30,27 +31,43 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <Card>
-      <CardContent className="pt-6">
+    <Card className="border-0 bg-transparent shadow-none">
+      <CardContent className="p-0 sm:p-0">
+        <h1 className="text-3xl font-semibold tracking-tight">Bom ter você aqui.</h1>
+        <p className="mb-8 mt-3 text-sm text-muted-foreground">
+          Entre para acompanhar as finanças de vocês.
+        </p>
         <form action={loginAction} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">E-mail</Label>
-            <Input id="email" name="email" type="email" autoComplete="email" required />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">Senha</Label>
             <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="seu@email.com"
               required
             />
           </div>
-          {error && <p className="text-sm text-destructive">E-mail ou senha inválidos.</p>}
-          <Button type="submit" className="mt-2 w-full">
-            Entrar
-          </Button>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="password">Senha</Label>
+            <PasswordInput
+              id="password"
+              name="password"
+              autoComplete="current-password"
+              placeholder="Sua senha"
+              required
+            />
+          </div>
+          {error && (
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              E-mail ou senha inválidos. Confira os dados e tente novamente.
+            </p>
+          )}
+          <LoginSubmit />
         </form>
       </CardContent>
     </Card>
