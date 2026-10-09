@@ -21,7 +21,10 @@ echo ">> [1/4] Build da imagem nova (app antigo continua no ar)..."
 $DC build
 
 echo ">> [2/4] Garantindo o banco no ar e saudável..."
-$DC up -d db
+# --no-recreate: só liga o banco se estiver parado. Sem ele, mudar o serviço `db` no compose fazia o v1
+# recriar aqui e cair no bug ContainerConfig (banco renomeado e parado, 08/10/2026). A config nova do
+# banco entra no down+up do passo 3, que cria do zero.
+$DC up -d --no-recreate db
 i=0
 while [ "$i" -lt 40 ]; do
   cid="$($DC ps -q db 2>/dev/null || true)"
